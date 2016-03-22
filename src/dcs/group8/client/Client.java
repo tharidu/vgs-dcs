@@ -43,7 +43,7 @@ public class Client implements ClientRemoteMessaging{
 		try{
 			ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.getRegistry();
-			registry.bind("ClientRemoteMessaging",crm_stub);
+			registry.bind(ClientRemoteMessaging.registry, crm_stub);
 			System.out.println("Client registry is properly set up");
 		}
 		catch(Exception e){

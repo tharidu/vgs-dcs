@@ -5,4 +5,5 @@ import java.rmi.RemoteException;
 
 public interface ResourceManagerRemoteMessaging extends Remote {
 
+	public static final String registry = "ResourceManagerRemoteMessaging";
 }

@@ -8,4 +8,6 @@ import java.rmi.RemoteException;
 public interface GridSchedulerRemoteMessaging extends Remote {
 	
 	public String clientToGsMessage(JobMessage message) throws RemoteException;
+	
+	public static final String registry = "GridSchedulerRemoteMessaging";
 }

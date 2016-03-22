@@ -97,7 +97,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		try{
 			GridSchedulerRemoteMessaging cgs_stub = (GridSchedulerRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.getRegistry();
-			registry.bind("GridSchedulerRemoteMessaging",cgs_stub);
+			registry.bind(GridSchedulerRemoteMessaging.registry, cgs_stub);
 			System.out.println("GridScheduler registry is properly set up!");
 			
 		}
