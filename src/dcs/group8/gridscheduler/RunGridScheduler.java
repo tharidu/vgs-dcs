@@ -5,7 +5,7 @@ import dcs.group8.models.GridScheduler;
 public class RunGridScheduler {
 
 	public static void main(String[] args) {
-		if (args.length < 2) {
+		if (args.length < 1) {
 			System.err.println("Please provide grid scheduler url!");
 			return;
 		}
