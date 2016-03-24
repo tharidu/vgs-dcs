@@ -108,6 +108,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 						.lookup("ResourceManagerRemoteMessaging");
 				String ack = rm_stub.gsToRmJobMessage(jb);
 				
+				// Update cluster status hashmap
 				GsClusterStatus gsClusterStatus = clusterStatus.get(assignedCluster);
 				gsClusterStatus.setBusyCount(gsClusterStatus.getBusyCount() + 1);
 				clusterStatus.put(assignedCluster, gsClusterStatus);
