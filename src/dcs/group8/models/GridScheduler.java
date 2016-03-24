@@ -68,7 +68,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 	@Override
 	public void run() {
-		// jobs recive and handover to RM
+		// jobs receive and handover to RM
 		System.out.println("Starting GS " + this.getUrl());
 
 		while (running) {
@@ -82,9 +82,9 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	}
 	
 	public String clientToGsMessage(JobMessage jb){
-		System.out.println("Message with id: "+jb.getJob_id()+
-				"\n From client with id: "+jb.getClient_id()+
-				"\n and job duration: "+jb.getJob_duration());
+		System.out.println("Message with id: "+jb.job.getJobId()+
+				"\n From client with id: "+jb.job.getClientId()+
+				"\n and job duration: "+jb.job.getJobDuration());
 		return "JobMessage was received";
 	}
 	

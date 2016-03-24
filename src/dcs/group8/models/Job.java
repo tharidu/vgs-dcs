@@ -1,19 +1,20 @@
 package dcs.group8.models;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.sql.Timestamp;
+import java.util.Date;
+import java.util.UUID;
 
 public class Job implements Serializable {
-	private long jobId;
+	private UUID jobId;
 	private long jobDuration;
 	private JobStatus jobStatus;
 	private Timestamp startTimestamp;
 	private Timestamp endTimestamp;
-	private long clientId;
-	private long clusterId;
+	private UUID clientId;
+	private UUID clusterId;
 	
-	public Job(long jobId, long jobDuration, long clientId) {
+	public Job(UUID jobId, long jobDuration, UUID clientId) {
 		this.jobId = jobId;
 		this.jobDuration = jobDuration;
 		this.clientId = clientId;
@@ -21,10 +22,10 @@ public class Job implements Serializable {
 		this.jobStatus = JobStatus.Ready;
 	}
 	
-	public long getJobId() {
+	public UUID getJobId() {
 		return jobId;
 	}
-	public void setJobId(long jobId) {
+	public void setJobId(UUID jobId) {
 		this.jobId = jobId;
 	}
 	public long getJobDuration() {
@@ -51,16 +52,16 @@ public class Job implements Serializable {
 	public void setEndTimestamp(Timestamp endTimestamp) {
 		this.endTimestamp = endTimestamp;
 	}
-	public long getClientId() {
+	public UUID getClientId() {
 		return clientId;
 	}
-	public void setClientId(long clientId) {
+	public void setClientId(UUID clientId) {
 		this.clientId = clientId;
 	}
-	public long getClusterId() {
+	public UUID getClusterId() {
 		return clusterId;
 	}
-	public void setClusterId(long clusterId) {
+	public void setClusterId(UUID clusterId) {
 		this.clusterId = clusterId;
 	}
 }
