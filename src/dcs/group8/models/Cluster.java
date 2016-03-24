@@ -77,7 +77,9 @@ public class Cluster implements Remote {
 
 		try {
 			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject.exportObject(this.resourceManager,0);
-			Registry registry = LocateRegistry.getRegistry("localhost");
+			//set the registry at the address of the cluster
+			//the methods are exposed by the resource manager...
+			Registry registry = LocateRegistry.getRegistry(host);
 			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
 			System.out.println("Resource Manager registry is properly set up!");
 			

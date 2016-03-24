@@ -19,6 +19,7 @@ public class PropertiesUtil {
 
 			return prop;
 		} catch (IOException e1) {
+			System.out.println("The requested properties file does not exist or could not be opened!");
 			e1.printStackTrace();
 			return null;
 		}

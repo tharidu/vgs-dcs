@@ -16,9 +16,20 @@ public class ResourceManager implements ResourceManagerRemoteMessaging{
 	private int rmNodes;
 	private List<Node> nodes;
 	
+	/**
+	 * The message send fromt the gs to this cluster's RM
+	 * to get information about the status of the resources
+	 * returns the number of available resources(nodes) currently
+	 * in the cluster
+	 */
+	public int gsToRmStatusMessage(){
+		return 5;
+	}
+	
 	public ResourceManager(int nodeCount){
 		this.rmNodes = nodeCount;
 		this.nodes = new ArrayList<Node>(nodeCount);
+		System.out.println("The resource manager is created..");
 	}
 	
 	public HashMap<Node, Job> getNodeStatus() {
@@ -35,6 +46,8 @@ public class ResourceManager implements ResourceManagerRemoteMessaging{
 	}
 	@Override
 	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
-		return "Job Completed";
+		//get a job here and assign it to one of the available nodes in the
+		//cluster
+		return null;
 	}
 }
