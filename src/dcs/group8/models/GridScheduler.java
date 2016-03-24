@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -13,7 +14,7 @@ import dcs.group8.messaging.JobMessage;
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private String host;
 	private ConcurrentLinkedQueue<Job> externalJobs;
-	private ConcurrentHashMap<String, String> clusterStatus;
+	private ConcurrentHashMap<UUID, Cluster> clusterStatus;
 	private ArrayList<String> gridschedulers;
 
 	// polling thread
@@ -42,11 +43,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		this.host = url;
 	}
 
-	public ConcurrentHashMap<String, String> getClusterStatus() {
+	public ConcurrentHashMap<UUID, Cluster> getClusterStatus() {
 		return clusterStatus;
 	}
 
-	public void setClusterStatus(ConcurrentHashMap<String, String> clusterStatus) {
+	public void setClusterStatus(ConcurrentHashMap<UUID, Cluster> clusterStatus) {
 		this.clusterStatus = clusterStatus;
 	}
 
@@ -85,6 +86,23 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		System.out.println("Message with id: "+jb.getJob_id()+
 				"\n From client with id: "+jb.getClient_id()+
 				"\n and job duration: "+jb.getJob_duration());
+		
+		UUID assignedCluster = null;
+		double lowestUtilization = 1;
+		for(ConcurrentHashMap.Entry<UUID, Cluster> entry : clusterStatus.entrySet()){
+			if(lowestUtilization > entry.getValue().returnUtilization()) {
+				lowestUtilization = entry.getValue().returnUtilization();
+				assignedCluster = entry.getKey();
+			}
+		}
+		
+		if(assignedCluster != null) {
+			// Found out one cluster to assign
+			
+		} else {
+			// Send it to external queue
+		}
+		
 		return "JobMessage was received";
 	}
 	
@@ -105,11 +123,6 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			System.err.println("GridScheduler registry wasn't set up: " + e.toString());
 			e.printStackTrace();
 		}
-		
-	}
-	
-	public void getJob() {
-		
 		
 	}
 

@@ -25,7 +25,7 @@ public class Cluster implements Remote {
 
 		this.resourceManager = new ResourceManager();
 		this.backupResourceManager = new ResourceManager();
-		
+
 		this.setUpRegistry();
 	}
 
@@ -68,24 +68,34 @@ public class Cluster implements Remote {
 	public void setGridSchedulerUrl(String gridSchedulerUrl) {
 		this.gridSchedulerHost = gridSchedulerUrl;
 	}
-	
+
 	/**
-	 * setup up the registry of the resource mamanger for all
-	 * messages it must handle from all entities of the DCS
+	 * setup up the registry of the resource mamanger for all messages it must
+	 * handle from all entities of the DCS
 	 */
-	private void setUpRegistry(){
-		
-		try{
-			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
+	private void setUpRegistry() {
+
+		try {
+			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject
+					.exportObject(this, 0);
 			Registry registry = LocateRegistry.getRegistry();
 			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
 			System.out.println("Resource Manager registry is properly set up!");
-			
-		}
-		catch(Exception e){
+
+		} catch (Exception e) {
 			System.err.println("Resource Manager registry wasn't set up: " + e.toString());
 			e.printStackTrace();
 		}
-		
+
+	}
+
+	public double returnUtilization() {
+		int count = 0;
+		for (int i = 0; i < nodes.size(); i++) {
+			if(nodes.get(i).getNodeStatus() == NodeStatus.Busy) {
+				count++;
+			}
+		}
+		return count/nodes.size();
 	}
 }
