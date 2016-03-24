@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
@@ -30,6 +31,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	public ResourceManager(int nodeCount) {
 		this.rmNodes = nodeCount;
 		this.nodes = new ArrayList<Node>(nodeCount);
+		this.jobEndTimes = new TreeMap<>();
 		System.out.println("The resource manager is created..");
 	}
 
