@@ -37,8 +37,9 @@ public class RunClient implements ClientRemoteMessaging{
 	private UUID myUUID;
 	private static String myIpAddress;
 	
-	public String gsToClientMessage(JobCompletionMessage jcm){
-		return "Thank you grid scheduler";
+	public void gsToClientMessage(JobMessage jcm){
+		System.out.println("My job with id: "+jcm.job.getJobId().toString()
+				+" was succesfully completed by Cluster: "+jcm.job.getClientId().toString());
 	}
 	
 	private void setUpRegistry(){

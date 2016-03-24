@@ -1,5 +1,6 @@
 package dcs.group8.models;
 
+import java.lang.invoke.MethodHandles.Lookup;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
@@ -125,7 +127,19 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		// of the cluster
 		UUID cid = message.job.getClusterId();
 		String clientid = message.job.getClientUrl();
-		//clusterStatus.put(cid,);
+		clusterStatus.get(cid).decreaseBusyCount();
+		Registry registry = LocateRegistry.getRegistry(clientid);
+		try
+		{
+		ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) registry
+										.lookup("ClientRemoteMessaging");
+		crm_stub.gsToClientMessage(message);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Message to client from GS : "+host+" could not be send");
+			e.printStackTrace();
+		}
 	}
 	
 	
