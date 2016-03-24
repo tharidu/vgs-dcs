@@ -23,8 +23,8 @@ public class Cluster implements Remote {
 		this.gridSchedulerHost = gridSchedulerUrl;
 		nodes = new ArrayList<Node>(nodeCount);
 
-		this.resourceManager = new ResourceManager();
-		this.backupResourceManager = new ResourceManager();
+		this.resourceManager = new ResourceManager(nodeCount);
+		this.backupResourceManager = new ResourceManager(nodeCount);
 
 		this.setUpRegistry();
 	}
@@ -76,13 +76,13 @@ public class Cluster implements Remote {
 	private void setUpRegistry() {
 
 		try {
-			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject
-					.exportObject(this, 0);
-			Registry registry = LocateRegistry.getRegistry();
+			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject.exportObject(this.resourceManager,0);
+			Registry registry = LocateRegistry.getRegistry("localhost");
 			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
 			System.out.println("Resource Manager registry is properly set up!");
-
-		} catch (Exception e) {
+			
+		}
+		catch(Exception e){
 			System.err.println("Resource Manager registry wasn't set up: " + e.toString());
 			e.printStackTrace();
 		}

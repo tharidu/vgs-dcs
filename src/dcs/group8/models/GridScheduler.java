@@ -82,8 +82,12 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			}
 		}
 	}
-
-	public String clientToGsMessage(JobMessage jb) {
+	/**
+	 * Receive a job from client here and push the job to a resource
+	 * manager after you first check the resources available at each
+	 * cluster
+	 */
+	public String clientToGsMessage(JobMessage jb){
 		UUID assignedCluster = null;
 		double lowestUtilization = 1;
 		
