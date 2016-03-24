@@ -1,9 +1,16 @@
 package dcs.group8.models;
 
+import java.rmi.Remote;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cluster {
+import dcs.group8.messaging.GridSchedulerRemoteMessaging;
+import dcs.group8.messaging.ResourceManagerRemoteMessaging;
+
+public class Cluster implements Remote {
 	private ResourceManager resourceManager;
 	private ResourceManager backupResourceManager;
 	private List<Node> nodes;
@@ -18,6 +25,8 @@ public class Cluster {
 
 		this.resourceManager = new ResourceManager();
 		this.backupResourceManager = new ResourceManager();
+		
+		this.setUpRegistry();
 	}
 
 	public ResourceManager getResourceManager() {
@@ -58,5 +67,25 @@ public class Cluster {
 
 	public void setGridSchedulerUrl(String gridSchedulerUrl) {
 		this.gridSchedulerHost = gridSchedulerUrl;
+	}
+	
+	/**
+	 * setup up the registry of the resource mamanger for all
+	 * messages it must handle from all entities of the DCS
+	 */
+	private void setUpRegistry(){
+		
+		try{
+			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
+			Registry registry = LocateRegistry.getRegistry();
+			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
+			System.out.println("Resource Manager registry is properly set up!");
+			
+		}
+		catch(Exception e){
+			System.err.println("Resource Manager registry wasn't set up: " + e.toString());
+			e.printStackTrace();
+		}
+		
 	}
 }
