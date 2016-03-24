@@ -10,6 +10,7 @@ import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 
 public class ResourceManager implements ResourceManagerRemoteMessaging{
+	
 	private HashMap<Node, Job> nodeStatus;
 	private LinkedList<Job> jobQueue;
 	private int rmNodes;

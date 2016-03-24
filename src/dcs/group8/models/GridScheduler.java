@@ -91,7 +91,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		UUID assignedCluster = null;
 		double lowestUtilization = 1;
 		
-		// Get the cluster with lowest utilisation and assig the job, otherwise offload to other GS
+		// Get the cluster with lowest utilisation and assign the job, otherwise offload to other GS
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
 			double utilization = entry.getValue().getBusyCount() / entry.getValue().getNodeCount();
 			if (lowestUtilization > utilization) {

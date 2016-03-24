@@ -7,7 +7,11 @@ import java.rmi.RemoteException;
 
 public interface GridSchedulerRemoteMessaging extends Remote {
 	
+	//this is called by the client to submit a job
 	public String clientToGsMessage(JobMessage message) throws RemoteException;
+	
+	//this is called by the resource manager to notify for the completion of a job
+	public String rmToGsMessage(JobMessage message) throws RemoteException;
 	
 	public static final String registry = "GridSchedulerRemoteMessaging";
 }
