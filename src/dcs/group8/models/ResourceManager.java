@@ -14,7 +14,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	
 	private LinkedList<Job> jobQueue;
 	private int rmNodes;
-	public ArrayList<Node> nodes;
+	public Node[] nodes;
 	public SortedMap<Long, Integer> jobEndTimes;
 	public int busyCount;
 
@@ -30,7 +30,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	
 	public ResourceManager(int nodeCount) {
 		this.rmNodes = nodeCount;
-		this.nodes = new ArrayList<Node>(nodeCount);
+		this.nodes = new Node[nodeCount];
 		this.jobEndTimes = new TreeMap<>();
 		System.out.println("The resource manager is created..");
 	}
@@ -46,14 +46,13 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	@Override
 	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
 		if (busyCount < rmNodes) {
-			for (int i = 0; i < nodes.size(); i++) {
-				if (nodes.get(i) == null) {
+			for (int i = 0; i < nodes.length; i++) {
+				if (nodes[i] == null) {
+					nodes[i] = new Node();
 					long currentTime = new Date().getTime();
-					Node node = nodes.get(i);
 					jbm.job.setJobStatus(JobStatus.Running);
 					jbm.job.setStartTimestamp(currentTime);
-					node.setJob(jbm.job);
-					nodes.set(i, node);
+					nodes[i].setJob(jbm.job);
 					jobEndTimes.put(currentTime + jbm.job.getJobDuration(), i);
 				}
 			}

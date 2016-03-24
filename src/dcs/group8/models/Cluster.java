@@ -114,8 +114,8 @@ public class Cluster implements Remote, Runnable {
 				if (entry.getKey() <= new Date().getTime()) {
 					// Job done
 					this.resourceManager.busyCount--;
-					Job job = this.resourceManager.nodes.get(entry.getValue()).getJob();
-					this.resourceManager.nodes.set(entry.getValue(), null);
+					Job job = this.resourceManager.nodes[entry.getValue()].getJob();
+					this.resourceManager.nodes[entry.getValue()] = null;
 					job.setEndTimestamp(new Date().getTime());
 					job.setJobStatus(JobStatus.Finished);
 					JobMessage jobMessage = new JobMessage(job);
