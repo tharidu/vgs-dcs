@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
+import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private String host;
@@ -80,12 +81,26 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			}
 		}
 	}
-	
+	/**
+	 * Receive a job from client here and push the job to a resource
+	 * manager after you first check the resources available at each
+	 * cluster
+	 */
 	public String clientToGsMessage(JobMessage jb){
-		System.out.println("Message with id: "+jb.job.getJobId()+
-				"\n From client with id: "+jb.job.getClientId()+
-				"\n and job duration: "+jb.job.getJobDuration());
-		return "JobMessage was received";
+		// you need to chech the status of the rms here but for now just send the
+		// the message to a resource manager
+		try{
+			Registry registry =  LocateRegistry.getRegistry("localhost");
+			ResourceManagerRemoteMessaging rm_stub =
+								(ResourceManagerRemoteMessaging)registry.lookup("ResourceManagerRemoteMessaging");
+			String ack = rm_stub.gsToRmJobMessage(jb);
+			System.out.println("The resource manager responded with: "+ack);
+		}
+		catch(Exception e){
+			System.err.println("Communication with resource manager was not established: "+e.toString());
+			e.printStackTrace();
+		}
+		return "JobMessage was received forwarding it to a resource manager";
 	}
 	
 	/**
