@@ -6,7 +6,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
@@ -91,7 +93,8 @@ public class Cluster implements Remote, Runnable {
 		try {
 			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject
 					.exportObject(this.resourceManager, 0);
-			Registry registry = LocateRegistry.getRegistry("localhost");
+			// the methods are exposed by the resource manager...
+			Registry registry = LocateRegistry.getRegistry(host);
 			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
 			System.out.println("Resource Manager registry is properly set up!");
 
@@ -106,8 +109,9 @@ public class Cluster implements Remote, Runnable {
 	public void run() {
 		System.out.println("Starting Cluster " + this.getUrl());
 		while (running) {
-			for (Entry<Long, Integer> entry : this.resourceManager.jobEndTimes.entrySet()) {
-				if(entry.getKey() <= new Date().getTime()) {
+			for (Iterator<Map.Entry<Long, Integer>> it = this.resourceManager.jobEndTimes.entrySet().iterator(); it.hasNext();) {
+				Entry<Long, Integer> entry = it.next();
+				if (entry.getKey() <= new Date().getTime()) {
 					// Job done
 					this.resourceManager.busyCount--;
 					Job job = this.resourceManager.nodes.get(entry.getValue()).getJob();
@@ -115,21 +119,16 @@ public class Cluster implements Remote, Runnable {
 					job.setEndTimestamp(new Date().getTime());
 					job.setJobStatus(JobStatus.Finished);
 					JobMessage jobMessage = new JobMessage(job);
-					
+					it.remove();
 					try {
-						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging)RegistryUtil.returnRegistry(this.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
-						String ack = gs_stub.
-						
-						
-						
-						System.out.println("The resource manager responded with: " + ack);
+						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+								.returnRegistry(this.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
+						gs_stub.rmToGsMessage(jobMessage);
+						System.out.println("Job completion sent to GS");
 					} catch (Exception e) {
-						System.err.println("Communication with resource manager was not established: " + e.toString());
+						System.err.println("Communication with GS was not established: " + e.toString());
 						e.printStackTrace();
 					}
-
-					
-					
 				}
 			}
 		}

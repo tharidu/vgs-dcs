@@ -1,28 +1,36 @@
 package dcs.group8.models;
 
 import java.rmi.RemoteException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.SortedMap;
-import java.util.UUID;
 
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 
 public class ResourceManager implements ResourceManagerRemoteMessaging {
+	
 	private LinkedList<Job> jobQueue;
 	private int rmNodes;
 	public ArrayList<Node> nodes;
 	public SortedMap<Long, Integer> jobEndTimes;
 	public int busyCount;
 
+	/**
+	 * The message send fromt the gs to this cluster's RM
+	 * to get information about the status of the resources
+	 * returns the number of available resources(nodes) currently
+	 * in the cluster
+	 */
+	public int gsToRmStatusMessage(){
+		return 5;
+	}
+	
 	public ResourceManager(int nodeCount) {
 		this.rmNodes = nodeCount;
 		this.nodes = new ArrayList<Node>(nodeCount);
+		System.out.println("The resource manager is created..");
 	}
 
 	public LinkedList<Job> getJobQueue() {
@@ -38,11 +46,12 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		if (busyCount < rmNodes) {
 			for (int i = 0; i < nodes.size(); i++) {
 				if (nodes.get(i) == null) {
+					long currentTime = new Date().getTime();
 					Node node = nodes.get(i);
+					jbm.job.setJobStatus(JobStatus.Running);
+					jbm.job.setStartTimestamp(currentTime);
 					node.setJob(jbm.job);
 					nodes.set(i, node);
-					long currentTime = new Date().getTime();
-					jbm.job.setStartTimestamp(currentTime);
 					jobEndTimes.put(currentTime + jbm.job.getJobDuration(), i);
 				}
 			}

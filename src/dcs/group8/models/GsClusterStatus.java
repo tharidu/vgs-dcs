@@ -6,6 +6,21 @@ public class GsClusterStatus {
 	private UUID clusterUUID;
 	private Integer nodeCount;
 	private Integer busyCount;
+	
+	public GsClusterStatus(UUID id,int nc,int bc){
+		clusterUUID = id;
+		nodeCount = nc;
+		busyCount = bc;
+	}
+	
+	public void decreaseBusyCount(){
+		this.busyCount-=1;
+	}
+	
+	public void increaseBusyCount(){
+		this.busyCount+=1;
+	}
+	
 	public UUID getClusterUUID() {
 		return clusterUUID;
 	}

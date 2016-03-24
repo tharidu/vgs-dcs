@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.UUID;
 
 public class Job implements Serializable {
+	
+	private String clientUrl;
 	private UUID jobId;
 	private long jobDuration;
 	private JobStatus jobStatus;
@@ -15,7 +17,8 @@ public class Job implements Serializable {
 	private UUID clientId;
 	private UUID clusterId;
 	
-	public Job(UUID jobId, long jobDuration, UUID clientId) {
+	public Job(UUID jobId, long jobDuration, UUID clientId, String clientUrl) {
+		this.clientUrl = clientUrl;
 		this.jobId = jobId;
 		this.jobDuration = jobDuration;
 		this.clientId = clientId;
@@ -23,6 +26,15 @@ public class Job implements Serializable {
 		this.jobStatus = JobStatus.Ready;
 	}
 	
+	
+	public String getClientUrl() {
+		return clientUrl;
+	}
+
+	public void setClientUrl(String clientUrl) {
+		this.clientUrl = clientUrl;
+	}
+
 	public UUID getJobId() {
 		return jobId;
 	}

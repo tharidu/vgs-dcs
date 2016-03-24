@@ -1,23 +1,33 @@
 package dcs.group8.models;
 
+import java.lang.invoke.MethodHandles.Lookup;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
+import dcs.group8.utils.PropertiesUtil;
 
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private String host;
 	private ConcurrentLinkedQueue<Job> externalJobs;
 	private ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus;
 	private ArrayList<String> gridschedulers;
-
+	private ArrayList<String> myClusters;
+	private int nodesPerCluster;
+	
+	private static Properties clusterProps;
+	private static Properties gsProps;
 	// polling thread
 	private Thread pollingThread;
 	private boolean running;
@@ -32,7 +42,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		running = true;
 		pollingThread = new Thread(this);
 		pollingThread.start();
-
+		gridSchedulerInit();
 		setUpRegistry();
 	}
 
@@ -67,7 +77,31 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	public void setGridschedulers(ArrayList<String> gridschedulers) {
 		this.gridschedulers = gridschedulers;
 	}
-
+	
+	/**
+	 * Initialization of a gridscheduler to save the addresses of the 
+	 * clusters under his responsibility as well as the addresses of
+	 * the rest of the gridschedulers in other VOs
+	 */
+	private void gridSchedulerInit(){
+		try{
+			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
+			gsProps  = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
+			gridschedulers = new ArrayList<String>(Arrays.asList(gsProps.getProperty("gsaddr").split(";")));
+			myClusters = new ArrayList<String>(Arrays.asList(clusterProps.getProperty("claddr").split(";")));
+			nodesPerCluster = Integer.parseInt(clusterProps.getProperty("nodes"));
+			//initialize the clusterStatus data structure
+			for(int i=0;i<myClusters.size();i++){
+				UUID id = UUID.randomUUID();
+				GsClusterStatus status = new GsClusterStatus(id,nodesPerCluster,0);
+				clusterStatus.put(id, status);			}
+		}
+		catch(Exception e){
+			System.err.println("Property files could not be found for gridsheduler: "+host);
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void run() {
 		// jobs receive and handover to RM
@@ -82,6 +116,33 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			}
 		}
 	}
+	
+	/**
+	 * Receive a notification from a resource manager of a cluster that a job
+	 * was completed
+	 */
+	@Override
+	public void rmToGsMessage(JobMessage message) throws RemoteException {
+		// first update the clusterStatus data structure based on the UUID
+		// of the cluster
+		UUID cid = message.job.getClusterId();
+		String clientid = message.job.getClientUrl();
+		clusterStatus.get(cid).decreaseBusyCount();
+		Registry registry = LocateRegistry.getRegistry(clientid);
+		try
+		{
+		ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) registry
+										.lookup("ClientRemoteMessaging");
+		crm_stub.gsToClientMessage(message);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Message to client from GS : "+host+" could not be send");
+			e.printStackTrace();
+		}
+	}
+	
+	
 	/**
 	 * Receive a job from client here and push the job to a resource
 	 * manager after you first check the resources available at each
@@ -91,7 +152,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		UUID assignedCluster = null;
 		double lowestUtilization = 1;
 		
-		// Get the cluster with lowest utilisation and assig the job, otherwise offload to other GS
+		// Get the cluster with lowest utilisation and assign the job, otherwise offload to other GS
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
 			double utilization = entry.getValue().getBusyCount() / entry.getValue().getNodeCount();
 			if (lowestUtilization > utilization) {
@@ -106,9 +167,10 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 				Registry registry = LocateRegistry.getRegistry("localhost");
 				ResourceManagerRemoteMessaging rm_stub = (ResourceManagerRemoteMessaging) registry
 						.lookup("ResourceManagerRemoteMessaging");
+				//set the cluster id in the job assigned to the cluster
+				jb.job.setClusterId(assignedCluster);
 				String ack = rm_stub.gsToRmJobMessage(jb);
 				
-				// Update cluster status hashmap
 				GsClusterStatus gsClusterStatus = clusterStatus.get(assignedCluster);
 				gsClusterStatus.setBusyCount(gsClusterStatus.getBusyCount() + 1);
 				clusterStatus.put(assignedCluster, gsClusterStatus);

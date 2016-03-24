@@ -8,4 +8,6 @@ public interface ResourceManagerRemoteMessaging extends Remote {
 	public static final String registry = "ResourceManagerRemoteMessaging";
 	
 	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException;
+	
+	public int gsToRmStatusMessage() throws RemoteException;
 }

@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 public interface ClientRemoteMessaging extends Remote {
 	
-	public String gsToClientMessage(JobCompletionMessage jcm) throws RemoteException;
+	public void gsToClientMessage(JobMessage jcm) throws RemoteException;
 
 	public static final String registry = "ClientRemoteMessaging";
 }
