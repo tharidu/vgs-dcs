@@ -70,7 +70,7 @@ public class Cluster implements Remote {
 	}
 
 	/**
-	 * setup up the registry of the resource mamanger for all messages it must
+	 * setup up the registry of the resource manager for all messages it must
 	 * handle from all entities of the DCS
 	 */
 	private void setUpRegistry() {
