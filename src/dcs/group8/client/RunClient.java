@@ -27,7 +27,7 @@ import dcs.group8.models.Job;
  * gridscheduler to submit a job to the DCS
  */
 
-public class Client implements ClientRemoteMessaging{
+public class RunClient implements ClientRemoteMessaging{
 	
 	private HashMap<String,String> gsAddressesMap;
 	private InputStream inputstream;
@@ -54,7 +54,7 @@ public class Client implements ClientRemoteMessaging{
 	}
 	
 	//create a client with the path to the properties file
-	public Client(String f){
+	public RunClient(String f){
 		this.propFile = f;
 		this.gsAddressesMap = new HashMap<String, String>();
 		this.myUUID = UUID.randomUUID();
@@ -94,7 +94,7 @@ public class Client implements ClientRemoteMessaging{
 	}
 	
 	public static void main(String[] args){
-		Client cl = new Client("resources/gridschedulers.properties");
+		RunClient cl = new RunClient("resources/gridschedulers.properties");
 		cl.getGsAddresses();
 		//set up clients registry
 		cl.setUpRegistry();
