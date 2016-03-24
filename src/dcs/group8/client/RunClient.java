@@ -18,6 +18,7 @@ import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobCompletionMessage;
 import dcs.group8.messaging.JobMessage;
+import dcs.group8.models.Job;
 
 /**
  * 
@@ -95,14 +96,13 @@ public class RunClient implements ClientRemoteMessaging{
 	public static void main(String[] args){
 		RunClient cl = new RunClient("resources/gridschedulers.properties");
 		cl.getGsAddresses();
+		//set up clients registry
 		cl.setUpRegistry();
 		String randomGs = cl.getRandomGsAddress();
-		//System.out.println(randomGs);
+
 		//create a new JobMessage and pass it to the gridscheduler
-		JobMessage jb = new JobMessage();
-		jb.setClient_id(cl.myUUID);
-		jb.setJob_duration(20);
-		jb.setJob_id(UUID.randomUUID());
+		Job job = new Job(UUID.randomUUID(), 20, cl.myUUID);
+		JobMessage jb = new JobMessage(job);
 		//System.out.println("Address of gs1 :"+cl.gsAddressesMap.get("gs1"));
 		
 		try{

@@ -10,11 +10,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
+import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private String host;
 	private ConcurrentLinkedQueue<Job> externalJobs;
-	private ConcurrentHashMap<UUID, Cluster> clusterStatus;
+	private ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus;
 	private ArrayList<String> gridschedulers;
 
 	// polling thread
@@ -43,11 +44,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		this.host = url;
 	}
 
-	public ConcurrentHashMap<UUID, Cluster> getClusterStatus() {
+	public ConcurrentHashMap<UUID, GsClusterStatus> getClusterStatus() {
 		return clusterStatus;
 	}
 
-	public void setClusterStatus(ConcurrentHashMap<UUID, Cluster> clusterStatus) {
+	public void setClusterStatus(ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus) {
 		this.clusterStatus = clusterStatus;
 	}
 
@@ -69,7 +70,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 	@Override
 	public void run() {
-		// jobs recive and handover to RM
+		// jobs receive and handover to RM
 		System.out.println("Starting GS " + this.getUrl());
 
 		while (running) {
@@ -83,24 +84,38 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	}
 	
 	public String clientToGsMessage(JobMessage jb){
-		System.out.println("Message with id: "+jb.getJob_id()+
-				"\n From client with id: "+jb.getClient_id()+
-				"\n and job duration: "+jb.getJob_duration());
-		
 		UUID assignedCluster = null;
 		double lowestUtilization = 1;
-		for(ConcurrentHashMap.Entry<UUID, Cluster> entry : clusterStatus.entrySet()){
-			if(lowestUtilization > entry.getValue().returnUtilization()) {
-				lowestUtilization = entry.getValue().returnUtilization();
+		for(ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()){
+			double utilization = entry.getValue().getBusyCount()/entry.getValue().getNodeCount();
+			if(lowestUtilization > utilization) {
+				lowestUtilization = utilization ;
 				assignedCluster = entry.getKey();
 			}
 		}
 		
 		if(assignedCluster != null) {
-			// Found out one cluster to assign
+			// Found out one cluster to assign the job
+			GsClusterStatus gsClusterStatus = clusterStatus.get(assignedCluster); 
+			gsClusterStatus.setBusyCount(gsClusterStatus.getBusyCount() + 1);
+			clusterStatus.put(assignedCluster, gsClusterStatus);
+			
+			try{
+				Registry registry =  LocateRegistry.getRegistry("localhost");
+				ResourceManagerRemoteMessaging rm_stub =
+									(ResourceManagerRemoteMessaging)registry.lookup("ResourceManagerRemoteMessaging");
+				String ack = rm_stub.gsToRmJobMessage(jb);
+				System.out.println("The resource manager responded with: "+ack);
+			}
+			catch(Exception e){
+				System.err.println("Communication with resource manager was not established: "+e.toString());
+				e.printStackTrace();
+			}
+			return "JobMessage was received forwarding it to a resource manager";
 			
 		} else {
 			// Send it to external queue
+			externalJobs.add(jb.job);
 		}
 		
 		return "JobMessage was received";
