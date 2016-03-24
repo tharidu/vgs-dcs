@@ -11,8 +11,9 @@ public class Job implements Serializable {
 	private UUID jobId;
 	private long jobDuration;
 	private JobStatus jobStatus;
-	private Timestamp startTimestamp;
-	private Timestamp endTimestamp;
+	private long startTimestamp;
+	private long executeTimestamp;
+	private long endTimestamp;
 	private UUID clientId;
 	private UUID clusterId;
 	
@@ -21,7 +22,7 @@ public class Job implements Serializable {
 		this.jobId = jobId;
 		this.jobDuration = jobDuration;
 		this.clientId = clientId;
-		this.startTimestamp = new Timestamp(new Date().getTime());
+		this.startTimestamp = new Date().getTime();
 		this.jobStatus = JobStatus.Ready;
 	}
 	
@@ -52,16 +53,16 @@ public class Job implements Serializable {
 	public void setJobStatus(JobStatus jobStatus) {
 		this.jobStatus = jobStatus;
 	}
-	public Timestamp getStartTimestamp() {
+	public long getStartTimestamp() {
 		return startTimestamp;
 	}
-	public void setStartTimestamp(Timestamp startTimestamp) {
+	public void setStartTimestamp(long startTimestamp) {
 		this.startTimestamp = startTimestamp;
 	}
-	public Timestamp getEndTimestamp() {
+	public long getEndTimestamp() {
 		return endTimestamp;
 	}
-	public void setEndTimestamp(Timestamp endTimestamp) {
+	public void setEndTimestamp(long endTimestamp) {
 		this.endTimestamp = endTimestamp;
 	}
 	public UUID getClientId() {
@@ -75,5 +76,13 @@ public class Job implements Serializable {
 	}
 	public void setClusterId(UUID clusterId) {
 		this.clusterId = clusterId;
+	}
+
+	public long getExecuteTimestamp() {
+		return executeTimestamp;
+	}
+
+	public void setExecuteTimestamp(long executeTimestamp) {
+		this.executeTimestamp = executeTimestamp;
 	}
 }
