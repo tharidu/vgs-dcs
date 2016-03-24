@@ -32,7 +32,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		running = true;
 		pollingThread = new Thread(this);
 		pollingThread.start();
-		
+
 		setUpRegistry();
 	}
 
@@ -82,63 +82,65 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			}
 		}
 	}
-	
-	public String clientToGsMessage(JobMessage jb){
+
+	public String clientToGsMessage(JobMessage jb) {
 		UUID assignedCluster = null;
 		double lowestUtilization = 1;
-		for(ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()){
-			double utilization = entry.getValue().getBusyCount()/entry.getValue().getNodeCount();
-			if(lowestUtilization > utilization) {
-				lowestUtilization = utilization ;
+		
+		// Get the cluster with lowest utilisation and assig the job, otherwise offload to other GS
+		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
+			double utilization = entry.getValue().getBusyCount() / entry.getValue().getNodeCount();
+			if (lowestUtilization > utilization) {
+				lowestUtilization = utilization;
 				assignedCluster = entry.getKey();
 			}
 		}
-		
-		if(assignedCluster != null) {
+
+		if (assignedCluster != null) {
 			// Found out one cluster to assign the job
-			GsClusterStatus gsClusterStatus = clusterStatus.get(assignedCluster); 
-			gsClusterStatus.setBusyCount(gsClusterStatus.getBusyCount() + 1);
-			clusterStatus.put(assignedCluster, gsClusterStatus);
-			
-			try{
-				Registry registry =  LocateRegistry.getRegistry("localhost");
-				ResourceManagerRemoteMessaging rm_stub =
-									(ResourceManagerRemoteMessaging)registry.lookup("ResourceManagerRemoteMessaging");
+			try {
+				Registry registry = LocateRegistry.getRegistry("localhost");
+				ResourceManagerRemoteMessaging rm_stub = (ResourceManagerRemoteMessaging) registry
+						.lookup("ResourceManagerRemoteMessaging");
 				String ack = rm_stub.gsToRmJobMessage(jb);
-				System.out.println("The resource manager responded with: "+ack);
-			}
-			catch(Exception e){
-				System.err.println("Communication with resource manager was not established: "+e.toString());
+				
+				GsClusterStatus gsClusterStatus = clusterStatus.get(assignedCluster);
+				gsClusterStatus.setBusyCount(gsClusterStatus.getBusyCount() + 1);
+				clusterStatus.put(assignedCluster, gsClusterStatus);
+				
+				System.out.println("The resource manager responded with: " + ack);
+			} catch (Exception e) {
+				System.err.println("Communication with resource manager was not established: " + e.toString());
 				e.printStackTrace();
 			}
 			return "JobMessage was received forwarding it to a resource manager";
-			
+
 		} else {
 			// Send it to external queue
 			externalJobs.add(jb.job);
 		}
-		
+
 		return "JobMessage was received";
 	}
-	
+
 	/**
-	 * setup up the registry of the grid scheduler for all
-	 * messages it must handle from all entities of the DCS
+	 * setup up the registry of the grid scheduler for all messages it must
+	 * handle from all entities of the DCS
 	 */
-	private void setUpRegistry(){
-		
-		try{
-			GridSchedulerRemoteMessaging cgs_stub = (GridSchedulerRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
+	private void setUpRegistry() {
+
+		try {
+			GridSchedulerRemoteMessaging cgs_stub = (GridSchedulerRemoteMessaging) UnicastRemoteObject
+					.exportObject(this, 0);
 			Registry registry = LocateRegistry.getRegistry();
 			registry.bind(GridSchedulerRemoteMessaging.registry, cgs_stub);
 			System.out.println("GridScheduler registry is properly set up!");
-			
-		}
-		catch(Exception e){
+
+		} catch (Exception e) {
 			System.err.println("GridScheduler registry wasn't set up: " + e.toString());
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void stopPollThread() {
