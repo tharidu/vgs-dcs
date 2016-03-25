@@ -13,5 +13,10 @@ public interface GridSchedulerRemoteMessaging extends Remote {
 	//this is called by the resource manager to notify for the completion of a job
 	public void rmToGsMessage(JobMessage message) throws RemoteException;
 	
+	//this a message from gs to gs to delegate a job to another grid scheduler
+	public String gsToGsJobMessage(JobMessage message) throws RemoteException;
+	
+	public String gsToGsStatusMessage(StatusMessage message) throws RemoteException;
+	
 	public static final String registry = "GridSchedulerRemoteMessaging";
 }

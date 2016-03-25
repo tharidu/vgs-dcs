@@ -80,6 +80,7 @@ public class RunClient implements ClientRemoteMessaging{
 		RunClient cl = new RunClient();
 		try{
 		myIpAddress = InetAddress.getLocalHost().getHostAddress();
+		System.out.println(myIpAddress);
 		}
 		catch(UnknownHostException ue){
 			System.err.println("Unknown host: "+ue.toString());
@@ -96,18 +97,27 @@ public class RunClient implements ClientRemoteMessaging{
 		
 		
 		cl.setUpRegistry();
-		String randomGs = cl.getRandomGsAddress();
+		//String randomGs = cl.getRandomGsAddress();
 
 		//create a new JobMessage and pass it to the gridscheduler
-		Job job = new Job(UUID.randomUUID(), 20, cl.myUUID,myIpAddress);
+		Job job = new Job(UUID.randomUUID(), 10000, cl.myUUID,myIpAddress);
+		Job job1 = new Job(UUID.randomUUID(), 1000, cl.myUUID, myIpAddress);
 		JobMessage jb = new JobMessage(job);
+		JobMessage jb1 = new JobMessage(job1);
 		//System.out.println("Address of gs1 :"+cl.gsAddressesMap.get("gs1"));
 		
 		try{
-			Registry registry = LocateRegistry.getRegistry(randomGs);
+			Registry registry = LocateRegistry.getRegistry(gsaddr);
 			GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
 			String ack = clgs_stub.clientToGsMessage(jb);
 			System.out.println("Response from the gridScheduler was: "+ack);
+			try{
+				Thread.sleep(2000);
+				String ack1 =clgs_stub.clientToGsMessage(jb1);
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		catch (Exception e ){
 			System.err.println("Exception on the client: "+e.toString());

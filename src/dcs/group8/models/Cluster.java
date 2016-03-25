@@ -16,7 +16,7 @@ import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 import dcs.group8.utils.RegistryUtil;
 
-public class Cluster implements Remote, Runnable {
+public class Cluster implements Remote {
 	private ResourceManager resourceManager;
 	private ResourceManager backupResourceManager;
 	private List<Node> nodes;
@@ -33,15 +33,15 @@ public class Cluster implements Remote, Runnable {
 		this.gridSchedulerHost = gridSchedulerUrl;
 		nodes = new ArrayList<Node>(nodeCount);
 
-		this.resourceManager = new ResourceManager(nodeCount);
-		this.backupResourceManager = new ResourceManager(nodeCount);
+		this.resourceManager = new ResourceManager(nodeCount,this);
+		this.backupResourceManager = new ResourceManager(nodeCount,this);
 
 		this.setUpRegistry();
 
 		// start the polling thread
 		running = true;
-		pollingThread = new Thread(this);
-		pollingThread.start();
+		//pollingThread = new Thread(this);
+		//pollingThread.start();
 	}
 
 	public ResourceManager getResourceManager() {
@@ -104,8 +104,10 @@ public class Cluster implements Remote, Runnable {
 		}
 
 	}
-
-	@Override
+	
+	// in this thread we are checking for finished jobs in the resource manager 
+	// in order to notify the gridscheduler..
+	/*@Override
 	public void run() {
 		System.out.println("Starting Cluster " + this.getUrl());
 		while (running) {
@@ -114,6 +116,7 @@ public class Cluster implements Remote, Runnable {
 				if (entry.getKey() <= new Date().getTime()) {
 					// Job done
 					this.resourceManager.busyCount--;
+					// we get the nodes structure from rm here concurrently?
 					Job job = this.resourceManager.nodes[entry.getValue()].getJob();
 					this.resourceManager.nodes[entry.getValue()] = null;
 					job.setEndTimestamp(new Date().getTime());
@@ -138,7 +141,7 @@ public class Cluster implements Remote, Runnable {
 
 			}
 		}
-	}
+	}*/
 
 	public void stopPollThread() {
 		System.out.println("Stopping Cluster " + this.getUrl());

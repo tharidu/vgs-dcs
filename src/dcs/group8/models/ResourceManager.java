@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
+import dcs.group8.utils.RegistryUtil;
 
 public class ResourceManager implements ResourceManagerRemoteMessaging {
 	
@@ -16,10 +18,12 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	private int rmNodes;
 	public Node[] nodes;
 	public SortedMap<Long, Integer> jobEndTimes;
-	public int busyCount;
+	public static int busyCount;
+	
+	private static Cluster myCluster;
 
 	/**
-	 * The message send fromt the gs to this cluster's RM
+	 * The message send from the gs to this cluster's RM
 	 * to get information about the status of the resources
 	 * returns the number of available resources(nodes) currently
 	 * in the cluster
@@ -28,11 +32,12 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		return 5;
 	}
 	
-	public ResourceManager(int nodeCount) {
+	public ResourceManager(int nodeCount,Cluster cl) {
 		this.rmNodes = nodeCount;
 		this.nodes = new Node[nodeCount];
 		this.jobEndTimes = new TreeMap<>();
 		System.out.println("The resource manager is created..");
+		myCluster = cl;
 	}
 
 	public LinkedList<Job> getJobQueue() {
@@ -42,8 +47,41 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	public void setJobQueue(LinkedList<Job> jobQueue) {
 		this.jobQueue = jobQueue;
 	}
+	
+	//here you call the rmToGsMessage
+	public static void callBackHandler(Job job){
+		try {
+			GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+					.returnRegistry(myCluster.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
+			gs_stub.rmToGsMessage(new JobMessage(job));
+			System.out.println("Job completion sent to GS from callback");
+		} catch (Exception e) {
+			System.err.println("Communication with GS was not established: " + e.toString());
+			e.printStackTrace();
+		}
+		
+		busyCount--;
+		System.out.println("Decreasing busy count "+busyCount);
+	}
+	
+	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
+		if(busyCount < rmNodes){
+			Thread th = new Thread(new Node(jbm.job, new CallBack() {
+				
+				@Override
+				public void callback() {
+					callBackHandler(jbm.job);
+					
+				}
+			}));
+			th.start();
+			busyCount++;
+			System.out.println("Adding busy count "+busyCount);
+		}
+		return "Job accepted by the resource manager and assigned to a node";
+	}
 
-	@Override
+	/*@Override
 	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
 		if (busyCount < rmNodes) {
 			for (int i = 0; i < nodes.length; i++) {
@@ -62,5 +100,5 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			System.err.println("RM full but job received");
 		}
 		return "Job Accepted";
-	}
+	}*/
 }

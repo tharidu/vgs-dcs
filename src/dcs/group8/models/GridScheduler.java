@@ -16,6 +16,7 @@ import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
+import dcs.group8.messaging.StatusMessage;
 import dcs.group8.utils.PropertiesUtil;
 
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
@@ -225,5 +226,18 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			assert (false) : "Grid scheduler stopPollThread was interrupted";
 		}
 
+	}
+
+	@Override
+	public String gsToGsJobMessage(JobMessage message) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String gsToGsStatusMessage(StatusMessage message)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
