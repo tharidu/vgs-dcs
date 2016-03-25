@@ -1,13 +1,8 @@
 package dcs.group8.cluster;
 
-import java.util.Properties;
-
 import dcs.group8.models.Cluster;
-import dcs.group8.utils.PropertiesUtil;
 
 public class RunCluster {
-
-	private static Properties ss;
 
 	public static void main(String[] args) {
 		if(args.length < 3) {
@@ -19,18 +14,6 @@ public class RunCluster {
 		int nodeCount = Integer.valueOf(args[2]);
 		
 		System.out.println("Launching cluster "+clusterUrl+" under gridscheduler: "+gridSchedulerUrl);
-		
-		/*try {
-			ss = PropertiesUtil.getProperties("dcs.group8.cluster.RunCluster", "gridschedulers.properties");
-			//System.out.println(ss.getProperty("gsaddr"));
-			String[] arr = ss.getProperty("gsaddr").split(";");
-			for (String s : arr ){
-				System.out.println(s);
-			}
-		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}*/
 		
 		try {
 			Cluster cluster = new Cluster(clusterUrl, gridSchedulerUrl, nodeCount);

@@ -34,9 +34,9 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private Thread pollingThread;
 	private boolean running;
 
-	public GridScheduler(String host) {
+	public GridScheduler() {
 		super();
-		this.host = host;
+		this.host = "localhost";
 		setExternalJobs(new ConcurrentLinkedQueue<Job>());
 		setClusterStatus(new ConcurrentHashMap<>());
 
@@ -95,7 +95,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			// initialize the clusterStatus data structure
 			for (int i = 0; i < myClusters.size(); i++) {
 				UUID id = UUID.randomUUID();
-				GsClusterStatus status = new GsClusterStatus(id, nodesPerCluster, 0);
+				GsClusterStatus status = new GsClusterStatus(id, myClusters.get(i), nodesPerCluster, 0);
 				clusterStatus.put(id, status);
 			}
 		} catch (Exception e) {
@@ -119,15 +119,17 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					double lowestUtilzation = 1;
 					String acceptedGsUrl = "";
 					for (String gsUrl : gridschedulers) {
-						GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil.returnRegistry(gsUrl, "GridSchedulerRemoteMessaging");
+						GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+								.returnRegistry(gsUrl, "GridSchedulerRemoteMessaging");
 						StatusMessage reply = gsm_stub.gsToGsStatusMessage();
 						if (reply.utilization < lowestUtilzation) {
 							lowestUtilzation = reply.utilization;
 							acceptedGsUrl = gsUrl;
 						}
 					}
-					
-					GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
+
+					GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+							.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
 					gsm_stub.gsToGsJobMessage(new JobMessage(job));
 					System.out.println("Job successfully sent to gs " + acceptedGsUrl);
 				}
@@ -156,7 +158,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		String clientid = message.job.getClientUrl();
 		clusterStatus.get(cid).decreaseBusyCount();
 		try {
-			ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) RegistryUtil.returnRegistry(clientid, "ClientRemoteMessaging");
+			ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) RegistryUtil.returnRegistry(clientid,
+					"ClientRemoteMessaging");
 			crm_stub.gsToClientMessage(message);
 		} catch (Exception e) {
 			System.err.println("Message to client from GS : " + host + " could not be send");
@@ -169,7 +172,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 * after you first check the resources available at each cluster
 	 */
 	public String clientToGsMessage(JobMessage jb) {
-		UUID assignedCluster = null;
+		ConcurrentHashMap.Entry<UUID, GsClusterStatus> selectedCluster = null;
 		double lowestUtilization = 1;
 
 		// Get the cluster with lowest utilisation and assign the job, otherwise
@@ -178,19 +181,20 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			double utilization = entry.getValue().getBusyCount() / entry.getValue().getNodeCount();
 			if (lowestUtilization > utilization) {
 				lowestUtilization = utilization;
-				assignedCluster = entry.getKey();
+				selectedCluster = entry;
 			}
 		}
 
-		if (assignedCluster != null) {
+		if (selectedCluster != null) {
 			// Found out one cluster to assign the job
 			try {
-				ResourceManagerRemoteMessaging rm_stub = (ResourceManagerRemoteMessaging) RegistryUtil.returnRegistry("localhost", "ResourceManagerRemoteMessaging");
+				ResourceManagerRemoteMessaging rm_stub = (ResourceManagerRemoteMessaging) RegistryUtil
+						.returnRegistry(selectedCluster.getValue().getClusterUrl(), "ResourceManagerRemoteMessaging");
 				// set the cluster id in the job assigned to the cluster
-				jb.job.setClusterId(assignedCluster);
+				jb.job.setClusterId(selectedCluster.getKey());
 				String ack = rm_stub.gsToRmJobMessage(jb);
 
-				clusterStatus.get(assignedCluster).increaseBusyCount();
+				clusterStatus.get(selectedCluster.getKey()).increaseBusyCount();
 				System.out.println("The resource manager responded with: " + ack);
 			} catch (Exception e) {
 				System.err.println("Communication with resource manager was not established: " + e.toString());
@@ -256,11 +260,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 * Returns overall utilization of all clusters under the GS
 	 */
 	public StatusMessage gsToGsStatusMessage() throws RemoteException {
-		int busyCount= 0;
+		int busyCount = 0;
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
 			busyCount += entry.getValue().getBusyCount();
 		}
-		
-		return new StatusMessage(busyCount/(nodesPerCluster*this.myClusters.size()));
+
+		return new StatusMessage(busyCount / (nodesPerCluster * this.myClusters.size()));
 	}
 }

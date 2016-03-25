@@ -1,7 +1,5 @@
 package dcs.group8.messaging;
 
-import java.util.UUID;
-
 import dcs.group8.models.Job;
 
 public class JobCompletionMessage extends Message {

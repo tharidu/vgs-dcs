@@ -4,11 +4,13 @@ import java.util.UUID;
 
 public class GsClusterStatus {
 	private UUID clusterUUID;
+	private String clusterUrl;
 	private Integer nodeCount;
 	private Integer busyCount;
 	
-	public GsClusterStatus(UUID id,int nc,int bc){
+	public GsClusterStatus(UUID id,String cluUrl, int nc,int bc){
 		clusterUUID = id;
+		clusterUrl = cluUrl;
 		nodeCount = nc;
 		busyCount = bc;
 	}
@@ -38,5 +40,13 @@ public class GsClusterStatus {
 	}
 	public void setBusyCount(Integer busyCount) {
 		this.busyCount = busyCount;
+	}
+
+	public String getClusterUrl() {
+		return clusterUrl;
+	}
+
+	public void setClusterUrl(String clusterUrl) {
+		this.clusterUrl = clusterUrl;
 	}
 }

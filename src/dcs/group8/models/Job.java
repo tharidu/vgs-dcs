@@ -1,12 +1,15 @@
 package dcs.group8.models;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
 public class Job implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1629778320006112305L;
 	private String clientUrl;
 	private UUID jobId;
 	private long jobDuration;

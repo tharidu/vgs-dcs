@@ -7,7 +7,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -16,7 +15,6 @@ import java.util.UUID;
 
 import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
-import dcs.group8.messaging.JobCompletionMessage;
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.models.Job;
 import dcs.group8.utils.PropertiesUtil;

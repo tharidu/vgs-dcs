@@ -5,16 +5,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import dcs.group8.messaging.GridSchedulerRemoteMessaging;
-import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
-import dcs.group8.utils.RegistryUtil;
 
 public class Cluster implements Remote {
 	private ResourceManager resourceManager;
@@ -25,7 +18,7 @@ public class Cluster implements Remote {
 
 	// polling thread
 	private Thread pollingThread;
-	private boolean running;
+//	private boolean running;
 
 	public Cluster(String url, String gridSchedulerUrl, int nodeCount) {
 		super();
@@ -39,7 +32,7 @@ public class Cluster implements Remote {
 		this.setUpRegistry();
 
 		// start the polling thread
-		running = true;
+//		running = true;
 		//pollingThread = new Thread(this);
 		//pollingThread.start();
 	}
@@ -151,7 +144,7 @@ public class Cluster implements Remote {
 			e.printStackTrace();
 		}
 
-		running = false;
+//		running = false;
 		try {
 			pollingThread.join();
 		} catch (InterruptedException ex) {
