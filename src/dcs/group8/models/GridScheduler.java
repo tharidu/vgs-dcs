@@ -1,5 +1,6 @@
 package dcs.group8.models;
 
+import java.net.InetAddress;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -89,7 +90,16 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		try {
 			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
 			gsProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
-			gridschedulers = new ArrayList<String>(Arrays.asList(gsProps.getProperty("gsaddr").split(";")));
+			
+			gridschedulers = new ArrayList<String>();
+			for (String gsAddr : gsProps.getProperty("gsaddr").split(";")) {
+				if (InetAddress.getLocalHost().getHostAddress() == gsAddr){
+					continue;
+				}
+				else{
+					gridschedulers.add(gsAddr);
+				}
+			}
 			myClusters = new ArrayList<String>(Arrays.asList(clusterProps.getProperty("claddr").split(";")));
 			nodesPerCluster = Integer.parseInt(clusterProps.getProperty("nodes"));
 			// initialize the clusterStatus data structure
