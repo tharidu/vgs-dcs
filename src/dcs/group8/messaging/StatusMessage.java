@@ -6,4 +6,11 @@ public class StatusMessage extends Message {
 	 * for it.
 	 */
 	private static final long serialVersionUID = 8329283164812478237L;
+	
+	public StatusMessage(double utilization) {
+		super();
+		this.utilization = utilization;
+	}
+
+	public double utilization;
 }

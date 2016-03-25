@@ -1,6 +1,6 @@
 package dcs.group8.models;
 
-import java.lang.invoke.MethodHandles.Lookup;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -18,6 +18,7 @@ import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 import dcs.group8.messaging.StatusMessage;
 import dcs.group8.utils.PropertiesUtil;
+import dcs.group8.utils.RegistryUtil;
 
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private String host;
@@ -26,7 +27,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private ArrayList<String> gridschedulers;
 	private ArrayList<String> myClusters;
 	private int nodesPerCluster;
-	
+
 	private static Properties clusterProps;
 	private static Properties gsProps;
 	// polling thread
@@ -36,7 +37,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	public GridScheduler(String host) {
 		super();
 		this.host = host;
-		setExternalJobs(new ConcurrentLinkedQueue<>());
+		setExternalJobs(new ConcurrentLinkedQueue<Job>());
 		setClusterStatus(new ConcurrentHashMap<>());
 
 		// start the polling thread
@@ -78,31 +79,31 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	public void setGridschedulers(ArrayList<String> gridschedulers) {
 		this.gridschedulers = gridschedulers;
 	}
-	
+
 	/**
-	 * Initialization of a gridscheduler to save the addresses of the 
-	 * clusters under his responsibility as well as the addresses of
-	 * the rest of the gridschedulers in other VOs
+	 * Initialization of a gridscheduler to save the addresses of the clusters
+	 * under his responsibility as well as the addresses of the rest of the
+	 * gridschedulers in other VOs
 	 */
-	private void gridSchedulerInit(){
-		try{
+	private void gridSchedulerInit() {
+		try {
 			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
-			gsProps  = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
+			gsProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
 			gridschedulers = new ArrayList<String>(Arrays.asList(gsProps.getProperty("gsaddr").split(";")));
 			myClusters = new ArrayList<String>(Arrays.asList(clusterProps.getProperty("claddr").split(";")));
 			nodesPerCluster = Integer.parseInt(clusterProps.getProperty("nodes"));
-			//initialize the clusterStatus data structure
-			for(int i=0;i<myClusters.size();i++){
+			// initialize the clusterStatus data structure
+			for (int i = 0; i < myClusters.size(); i++) {
 				UUID id = UUID.randomUUID();
-				GsClusterStatus status = new GsClusterStatus(id,nodesPerCluster,0);
-				clusterStatus.put(id, status);			}
-		}
-		catch(Exception e){
-			System.err.println("Property files could not be found for gridsheduler: "+host);
+				GsClusterStatus status = new GsClusterStatus(id, nodesPerCluster, 0);
+				clusterStatus.put(id, status);
+			}
+		} catch (Exception e) {
+			System.err.println("Property files could not be found for gridsheduler: " + host);
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		// jobs receive and handover to RM
@@ -112,12 +113,37 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			// sleep
 			try {
 				Thread.sleep(100);
+
+				Job job = externalJobs.poll();
+				if (job != null) {
+					double lowestUtilzation = 1;
+					String acceptedGsUrl = "";
+					for (String gsUrl : gridschedulers) {
+						GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil.returnRegistry(gsUrl, "GridSchedulerRemoteMessaging");
+						StatusMessage reply = gsm_stub.gsToGsStatusMessage();
+						if (reply.utilization < lowestUtilzation) {
+							lowestUtilzation = reply.utilization;
+							acceptedGsUrl = gsUrl;
+						}
+					}
+					
+					GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
+					gsm_stub.gsToGsJobMessage(new JobMessage(job));
+					System.out.println("Job successfully sent to gs " + acceptedGsUrl);
+				}
+
 			} catch (InterruptedException ex) {
 
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NotBoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	/**
 	 * Receive a notification from a resource manager of a cluster that a job
 	 * was completed
@@ -129,31 +155,25 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		UUID cid = message.job.getClusterId();
 		String clientid = message.job.getClientUrl();
 		clusterStatus.get(cid).decreaseBusyCount();
-		Registry registry = LocateRegistry.getRegistry(clientid);
-		try
-		{
-		ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) registry
-										.lookup("ClientRemoteMessaging");
-		crm_stub.gsToClientMessage(message);
-		}
-		catch(Exception e)
-		{
-			System.err.println("Message to client from GS : "+host+" could not be send");
+		try {
+			ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) RegistryUtil.returnRegistry(clientid, "ClientRemoteMessaging");
+			crm_stub.gsToClientMessage(message);
+		} catch (Exception e) {
+			System.err.println("Message to client from GS : " + host + " could not be send");
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	/**
-	 * Receive a job from client here and push the job to a resource
-	 * manager after you first check the resources available at each
-	 * cluster
+	 * Receive a job from client here and push the job to a resource manager
+	 * after you first check the resources available at each cluster
 	 */
-	public String clientToGsMessage(JobMessage jb){
+	public String clientToGsMessage(JobMessage jb) {
 		UUID assignedCluster = null;
 		double lowestUtilization = 1;
-		
-		// Get the cluster with lowest utilisation and assign the job, otherwise offload to other GS
+
+		// Get the cluster with lowest utilisation and assign the job, otherwise
+		// offload to other GS
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
 			double utilization = entry.getValue().getBusyCount() / entry.getValue().getNodeCount();
 			if (lowestUtilization > utilization) {
@@ -165,17 +185,12 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		if (assignedCluster != null) {
 			// Found out one cluster to assign the job
 			try {
-				Registry registry = LocateRegistry.getRegistry("localhost");
-				ResourceManagerRemoteMessaging rm_stub = (ResourceManagerRemoteMessaging) registry
-						.lookup("ResourceManagerRemoteMessaging");
-				//set the cluster id in the job assigned to the cluster
+				ResourceManagerRemoteMessaging rm_stub = (ResourceManagerRemoteMessaging) RegistryUtil.returnRegistry("localhost", "ResourceManagerRemoteMessaging");
+				// set the cluster id in the job assigned to the cluster
 				jb.job.setClusterId(assignedCluster);
 				String ack = rm_stub.gsToRmJobMessage(jb);
-				
-				GsClusterStatus gsClusterStatus = clusterStatus.get(assignedCluster);
-				gsClusterStatus.setBusyCount(gsClusterStatus.getBusyCount() + 1);
-				clusterStatus.put(assignedCluster, gsClusterStatus);
-				
+
+				clusterStatus.get(assignedCluster).increaseBusyCount();
 				System.out.println("The resource manager responded with: " + ack);
 			} catch (Exception e) {
 				System.err.println("Communication with resource manager was not established: " + e.toString());
@@ -225,19 +240,27 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		} catch (InterruptedException ex) {
 			assert (false) : "Grid scheduler stopPollThread was interrupted";
 		}
-
 	}
 
 	@Override
-	public String gsToGsJobMessage(JobMessage message) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Offloads the job to another GS
+	 */
+	public void gsToGsJobMessage(JobMessage message) throws RemoteException {
+		System.out.println("Job received from another GS");
+		clientToGsMessage(message);
 	}
 
 	@Override
-	public String gsToGsStatusMessage(StatusMessage message)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Returns overall utilization of all clusters under the GS
+	 */
+	public StatusMessage gsToGsStatusMessage() throws RemoteException {
+		int busyCount= 0;
+		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
+			busyCount += entry.getValue().getBusyCount();
+		}
+		
+		return new StatusMessage(busyCount/(nodesPerCluster*this.myClusters.size()));
 	}
 }
