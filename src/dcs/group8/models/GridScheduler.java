@@ -139,6 +139,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 				Job job = externalJobs.poll();
 				if (job != null) {
+					
+					// Check local resorces also
+					
+					
+					// Check remote gs
 					double lowestUtilzation = 1;
 					String acceptedGsUrl = "";
 					for (String gsUrl : gridschedulers) {
@@ -149,6 +154,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 							lowestUtilzation = reply.utilization;
 							acceptedGsUrl = gsUrl;
 						}
+					}
+					
+					if(acceptedGsUrl == "") {
+						externalJobs.add(job);
+						System.err.println("Failed to find a suitable GS to offload the job");
 					}
 
 					GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
