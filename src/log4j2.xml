@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logging configurations for client,grid schedulers and clusters -->
+<Configuration>
+  <Appenders>
+    <File name="${sys:logfileclient}" fileName="logs/${sys:logfileclient}.log" append="false">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </File>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="dcs.group8.client.RunClient" level="trace" additivity="false">
+      <AppenderRef ref="${sys:logfileclient}"/>
+    </Logger>
+    <Root level="trace">
+      <AppenderRef ref="STDOUT"/>
+    </Root>
+  </Loggers>
+  
+  <Appenders>
+    <File name="${sys:logfilegs}" fileName="logs/${sys:logfilegs}.log" append="false">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </File>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="dcs.group8.models.GridScheduler" level="trace" additivity="false">
+      <AppenderRef ref="${sys:logfilegs}"/>
+    </Logger>
+    <Root level="trace">
+      <AppenderRef ref="STDOUT"/>
+    </Root>
+  </Loggers>
+  
+  <Appenders>
+    <File name="${sys:logfilecluster}" fileName="logs/${sys:logfilecluster}.log" append="false">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </File>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="dcs.group8.models.Cluster" level="trace" additivity="false">
+      <AppenderRef ref="${sys:logfilecluster}"/>
+    </Logger>
+    <Root level="trace">
+      <AppenderRef ref="STDOUT"/>
+    </Root>
+  </Loggers>
+  
+  <Appenders>
+    <File name="${sys:logfilerm}" fileName="logs/${sys:logfilerm}.log" append="false">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </File>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="dcs.group8.models.ResourceManager" level="trace" additivity="false">
+      <AppenderRef ref="${sys:logfilerm}"/>
+    </Logger>
+    <Root level="trace">
+      <AppenderRef ref="STDOUT"/>
+    </Root>
+  </Loggers>
+</Configuration>

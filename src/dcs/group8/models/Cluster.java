@@ -7,13 +7,18 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 
 public class Cluster implements Remote {
+	private static Logger logger;
+	
 	private ResourceManager resourceManager;
 	private ResourceManager backupResourceManager;
 	private List<Node> nodes;
-	private String host;
+	public String host;
 	private String gridSchedulerHost;
 
 	// polling thread
@@ -23,9 +28,13 @@ public class Cluster implements Remote {
 	public Cluster(String url, String gridSchedulerUrl, int nodeCount) {
 		super();
 		this.host = url;
+		System.setProperty("logfilecluster", "cluster@"+this.host);
+		logger = LogManager.getLogger(Cluster.class);
+		logger.info("Initializing cluster@"+this.host);
 		this.gridSchedulerHost = gridSchedulerUrl;
 		nodes = new ArrayList<Node>(nodeCount);
-
+		
+		logger.info("Creating a resource manager for this cluster with "+nodeCount+" nodes");
 		this.resourceManager = new ResourceManager(nodeCount,this);
 		this.backupResourceManager = new ResourceManager(nodeCount,this);
 

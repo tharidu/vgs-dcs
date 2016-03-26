@@ -1,6 +1,7 @@
 package dcs.group8.models;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -13,6 +14,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
@@ -22,6 +26,8 @@ import dcs.group8.utils.PropertiesUtil;
 import dcs.group8.utils.RegistryUtil;
 
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
+	private static Logger logger;
+	
 	private String host;
 	private ConcurrentLinkedQueue<Job> externalJobs;
 	private ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus;
@@ -37,11 +43,17 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 	public GridScheduler() {
 		super();
-		this.host = "localhost";
+		try {
+			this.host = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		System.setProperty("logfilegs", "gs@"+this.host);
 		setExternalJobs(new ConcurrentLinkedQueue<Job>());
 		setClusterStatus(new ConcurrentHashMap<>());
-
+		logger = LogManager.getLogger(GridScheduler.class);
 		// start the polling thread
+		logger.info("Initializing gs@"+this.host);
 		running = true;
 		pollingThread = new Thread(this);
 		pollingThread.start();
@@ -87,6 +99,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 * gridschedulers in other VOs
 	 */
 	private void gridSchedulerInit() {
+		logger.info("Reading properties files for clusters and grid schedulers");
 		try {
 			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
 			gsProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
@@ -109,7 +122,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 				clusterStatus.put(id, status);
 			}
 		} catch (Exception e) {
-			System.err.println("Property files could not be found for gridsheduler: " + host);
+			logger.error("Unable to read property files.."+e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -117,7 +130,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	@Override
 	public void run() {
 		// jobs receive and handover to RM
-		System.out.println("Starting GS " + this.getUrl());
+		logger.info("Starting gs@"+this.getUrl());
 
 		while (running) {
 			// sleep
@@ -141,13 +154,16 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 							.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
 					gsm_stub.gsToGsJobMessage(new JobMessage(job));
-					System.out.println("Job successfully sent to gs " + acceptedGsUrl);
+					logger.info("Job successfully sent to gs@"+acceptedGsUrl);
+					//System.out.println("Job successfully sent to gs " + acceptedGsUrl);
 				}
 
 			} catch (InterruptedException ex) {
+				logger.error("Thread run was interrupted in gs@"+this.host);
+				ex.printStackTrace();
 
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				logger.error("Remote error exception in gs@"+this.host+e.toString());
 				e.printStackTrace();
 			} catch (NotBoundException e) {
 				// TODO Auto-generated catch block

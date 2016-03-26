@@ -5,13 +5,16 @@ import java.util.LinkedList;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 import dcs.group8.utils.RegistryUtil;
 
 public class ResourceManager implements ResourceManagerRemoteMessaging {
-	
+	private static Logger logger;
 	private LinkedList<Job> jobQueue;
 	private int rmNodes;
 	public Node[] nodes;
@@ -34,8 +37,11 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		this.rmNodes = nodeCount;
 		this.nodes = new Node[nodeCount];
 		this.jobEndTimes = new TreeMap<>();
-		System.out.println("The resource manager is created..");
+		/*System.out.println("The resource manager is created..");*/
 		myCluster = cl;
+		System.setProperty("logfilerm", "rm@"+myCluster.host);
+		logger = LogManager.getLogger(ResourceManager.class);
+		logger.info("The resource manager rm@"+myCluster.host+" was created");
 	}
 
 	public LinkedList<Job> getJobQueue() {
