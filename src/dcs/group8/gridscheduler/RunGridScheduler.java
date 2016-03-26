@@ -8,7 +8,7 @@ public class RunGridScheduler {
 		System.out.println("Launching cluster...");
 
 		try {
-			GridScheduler gridScheduler = new GridScheduler();
+			GridScheduler gridScheduler = new GridScheduler("");
 		} catch (Exception e) {
 
 		}
