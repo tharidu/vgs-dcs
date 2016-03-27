@@ -1,6 +1,7 @@
 package dcs.group8.models;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -13,6 +14,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
@@ -24,6 +28,8 @@ import dcs.group8.utils.RetryException;
 import dcs.group8.utils.RetryStrategy;
 
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
+	private static Logger logger;
+	
 	private String host;
 	private String backupHost;
 	private ConcurrentLinkedQueue<Job> externalJobs;
@@ -31,6 +37,34 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private ArrayList<String> gridschedulers;
 	private ArrayList<String> myClusters;
 	private int nodesPerCluster;
+	
+	private ConcurrentLinkedQueue<Job> backupExternalJobs;
+	public ConcurrentLinkedQueue<Job> getBackupExternalJobs() {
+		return backupExternalJobs;
+	}
+
+	public void setBackupExternalJobs(ConcurrentLinkedQueue<Job> backupExternalJobs) {
+		this.backupExternalJobs = backupExternalJobs;
+	}
+
+	public ConcurrentHashMap<UUID, GsClusterStatus> getBackupClusterStatus() {
+		return backupClusterStatus;
+	}
+
+	public void setBackupClusterStatus(ConcurrentHashMap<UUID, GsClusterStatus> backupClusterStatus) {
+		this.backupClusterStatus = backupClusterStatus;
+	}
+
+	public ArrayList<String> getBackupMyClusters() {
+		return backupMyClusters;
+	}
+
+	public void setBackupMyClusters(ArrayList<String> backupMyClusters) {
+		this.backupMyClusters = backupMyClusters;
+	}
+
+	private ConcurrentHashMap<UUID, GsClusterStatus> backupClusterStatus;
+	private ArrayList<String> backupMyClusters;
 
 	private static Properties clusterProps;
 	private static Properties gsProps;
@@ -40,19 +74,24 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 	public GridScheduler(String backup) {
 		super();
-		this.host = "localhost";
 		backupHost = backup;
+		
+		try {
+			this.host = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		System.setProperty("logfilegs", "gs@"+this.host);
 		setExternalJobs(new ConcurrentLinkedQueue<Job>());
 		setClusterStatus(new ConcurrentHashMap<>());
-
-		// Initialize grid scheduler and setup the registry
-		gridSchedulerInit();
-		setUpRegistry();
-		
+		logger = LogManager.getLogger(GridScheduler.class);
 		// start the polling thread
+		logger.info("Initializing gs@"+this.host);
 		running = true;
 		pollingThread = new Thread(this);
 		pollingThread.start();
+		gridSchedulerInit();
+		setUpRegistry();
 	}
 
 	public String getUrl() {
@@ -86,6 +125,14 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	public void setGridschedulers(ArrayList<String> gridschedulers) {
 		this.gridschedulers = gridschedulers;
 	}
+	
+	public String getBackupHost() {
+		return backupHost;
+	}
+
+	public void setBackupHost(String backupHost) {
+		this.backupHost = backupHost;
+	}
 
 	/**
 	 * Initialization of a gridscheduler to save the addresses of the clusters
@@ -93,15 +140,17 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 * gridschedulers in other VOs
 	 */
 	private void gridSchedulerInit() {
+		logger.info("Reading properties files for clusters and grid schedulers");
 		try {
 			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
 			gsProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
-
+			
 			gridschedulers = new ArrayList<String>();
 			for (String gsAddr : gsProps.getProperty("gsaddr").split(";")) {
-				if (InetAddress.getLocalHost().getHostAddress() == gsAddr) {
+				if (InetAddress.getLocalHost().getHostAddress() == gsAddr){
 					continue;
-				} else {
+				}
+				else{
 					gridschedulers.add(gsAddr);
 				}
 			}
@@ -114,7 +163,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 				clusterStatus.put(id, status);
 			}
 		} catch (Exception e) {
-			System.err.println("Property files could not be found for gridsheduler: " + host);
+			logger.error("Unable to read property files.."+e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -122,7 +171,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	@Override
 	public void run() {
 		// jobs receive and handover to RM
-		System.out.println("Starting GS " + this.getUrl());
+		logger.info("Starting gs@"+this.getUrl());
 
 		while (running) {
 			// sleep
@@ -131,9 +180,10 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 				Job job = externalJobs.poll();
 				if (job != null) {
-
+					
 					// Check local resorces also
-
+					
+					
 					// Check remote gs
 					double lowestUtilzation = 1;
 					String acceptedGsUrl = "";
@@ -146,8 +196,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 							acceptedGsUrl = gsUrl;
 						}
 					}
-
-					if (acceptedGsUrl == "") {
+					
+					if(acceptedGsUrl == "") {
 						externalJobs.add(job);
 						System.err.println("Failed to find a suitable GS to offload the job");
 					}
@@ -155,13 +205,16 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 							.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
 					gsm_stub.gsToGsJobMessage(new JobMessage(job));
-					System.out.println("Job successfully sent to gs " + acceptedGsUrl);
+					logger.info("Job successfully sent to gs@"+acceptedGsUrl);
+					//System.out.println("Job successfully sent to gs " + acceptedGsUrl);
 				}
 
 			} catch (InterruptedException ex) {
+				logger.error("Thread run was interrupted in gs@"+this.host);
+				ex.printStackTrace();
 
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
+				logger.error("Remote error exception in gs@"+this.host+e.toString());
 				e.printStackTrace();
 			} catch (NotBoundException e) {
 				// TODO Auto-generated catch block
@@ -314,11 +367,13 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		return new StatusMessage(busyCount / (nodesPerCluster * this.myClusters.size()));
 	}
 
-	public String getBackupHost() {
-		return backupHost;
-	}
-
-	public void setBackupHost(String backupHost) {
-		this.backupHost = backupHost;
+	@Override
+	public void sendBackupGS(ConcurrentLinkedQueue<Job> externalJobs,
+			ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus, ArrayList<String> myClusters)
+			throws RemoteException {
+		backupExternalJobs = externalJobs;
+		backupClusterStatus = clusterStatus;
+		backupMyClusters = myClusters;
+		
 	}
 }

@@ -1,8 +1,13 @@
 package dcs.group8.models;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class GsClusterStatus {
+public class GsClusterStatus implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2966305870446790227L;
 	private UUID clusterUUID;
 	private String clusterUrl;
 	private Integer nodeCount;

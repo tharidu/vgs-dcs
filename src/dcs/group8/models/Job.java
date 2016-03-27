@@ -29,6 +29,12 @@ public class Job implements Serializable {
 		this.jobStatus = JobStatus.Ready;
 	}
 	
+	@Override
+	public String toString(){
+		return " Job_id: "+this.jobId+" from client@"+this.clientUrl+" ";
+		
+	}
+	
 	
 	public String getClientUrl() {
 		return clientUrl;
