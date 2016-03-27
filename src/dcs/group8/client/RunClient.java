@@ -41,7 +41,7 @@ public class RunClient implements ClientRemoteMessaging{
 	private static String myIpAddress;
 	
 	public void gsToClientMessage(JobMessage jcm){
-		System.out.println("My job with id: "+jcm.job.getJobId().toString()
+		logger.info("My job with id: "+jcm.job.getJobId().toString()
 				+" was succesfully completed by Cluster: "+jcm.job.getClientId().toString());
 	}
 	
@@ -51,10 +51,10 @@ public class RunClient implements ClientRemoteMessaging{
 			ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.getRegistry();
 			registry.bind(ClientRemoteMessaging.registry, crm_stub);
-			System.out.println("Client registry is properly set up");
+			logger.info("Client registry is properly set up");
 		}
 		catch(Exception e){
-			System.err.println("Client registry wasn't set up: "+e.toString());
+			logger.error("Client registry wasn't set up: "+e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -80,20 +80,18 @@ public class RunClient implements ClientRemoteMessaging{
 	}
 	
 	public static void main(String[] args){
+		
+		try{
+			myIpAddress = InetAddress.getLocalHost().getHostAddress();
+		}
+		catch(UnknownHostException ue){
+			ue.printStackTrace();
+		}
 		//set in the system properties the file where the client should log info
 		System.setProperty("logfileclient", "client@"+myIpAddress);
 		logger = LogManager.getLogger(RunClient.class);
 		logger.info("Creatind a new client");
 		RunClient cl = new RunClient();
-		
-		try{
-		myIpAddress = InetAddress.getLocalHost().getHostAddress();
-		System.out.println(myIpAddress);
-		}
-		catch(UnknownHostException ue){
-			logger.error("Could not retrieve my ip address "+ue.toString());
-			ue.printStackTrace();
-		}
 		try{
 			properties = PropertiesUtil.getProperties("dcs.group8.client.RunClient","gridschedulers.properties");
 		}
@@ -101,13 +99,13 @@ public class RunClient implements ClientRemoteMessaging{
 			logger.error("Could not read the properties file for the gridscheduler addresses");
 		}
 		String[] gsarr = properties.getProperty("gsaddr").split(";");
-		String gsaddr = "172.20.92.32";
+		String gsaddr = "localhost";
 		logger.info("Creating jobs to submit to the Distributed System");
 		cl.setUpRegistry();
 		Job job = new Job(UUID.randomUUID(), 10000, cl.myUUID,myIpAddress);
-		Job job1 = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
+		//Job job1 = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
 		JobMessage jb = new JobMessage(job);
-		JobMessage jb1 = new JobMessage(job1);
+		//JobMessage jb1 = new JobMessage(job1);
 		//System.out.println("Address of gs1 :"+cl.gsAddressesMap.get("gs1"));
 		
 		try{
@@ -117,9 +115,9 @@ public class RunClient implements ClientRemoteMessaging{
 			String ack = clgs_stub.clientToGsMessage(jb);
 			logger.info("[+]Response from gs@"+gsaddr+":"+ack);
 			
-			logger.info("[+] Submitting"+jb.toString()+" to gs@"+gsaddr);
-			String ack1 =clgs_stub.clientToGsMessage(jb1);
-			logger.info("[+]Response from gs@"+gsaddr+":"+ack1);
+			//logger.info("[+] Submitting"+jb.toString()+" to gs@"+gsaddr);
+			//String ack1 =clgs_stub.clientToGsMessage(jb1);
+			//logger.info("[+]Response from gs@"+gsaddr+":"+ack1);
 			/*try{
 				Thread.sleep(2000);
 				String ack1 =clgs_stub.clientToGsMessage(jb1);

@@ -39,7 +39,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		this.jobEndTimes = new TreeMap<>();
 		/*System.out.println("The resource manager is created..");*/
 		myCluster = cl;
-		System.setProperty("logfilerm", "rm@"+myCluster.host);
+		//System.setProperty("logfilerm", "rm@"+myCluster.host);
 		logger = LogManager.getLogger(ResourceManager.class);
 		logger.info("The resource manager rm@"+myCluster.host+" was created");
 	}
@@ -58,14 +58,15 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 					.returnRegistry(myCluster.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
 			gs_stub.rmToGsMessage(new JobMessage(job));
-			System.out.println("Job completion sent to GS from callback");
+			logger.info("Job with Job_id:"+job.getJobId()+" was completed");
 		} catch (Exception e) {
-			System.err.println("Communication with GS was not established: " + e.toString());
+			//System.err.println("Communication with GS was not established: " + e.toString());
+			logger.error("Could not communicate with gs@"+myCluster.getGridSchedulerUrl());
 			e.printStackTrace();
 		}
 		
 		busyCount--;
-		System.out.println("Decreasing busy count "+busyCount);
+		logger.info("One more node is available now");
 	}
 	
 	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
@@ -80,7 +81,8 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			}));
 			th.start();
 			busyCount++;
-			System.out.println("Adding busy count "+busyCount);
+			//System.out.println("Adding busy count "+busyCount);
+			logger.info("Adding a job to a node");
 		}
 		return "Job accepted by the resource manager and assigned to a node";
 	}
