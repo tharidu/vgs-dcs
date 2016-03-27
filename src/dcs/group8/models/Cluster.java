@@ -29,6 +29,7 @@ public class Cluster implements Remote {
 		super();
 		this.host = url;
 		System.setProperty("logfilecluster", "cluster@"+this.host);
+		System.setProperty("logfilerm", "rm@"+this.host);
 		logger = LogManager.getLogger(Cluster.class);
 		logger.info("Initializing cluster@"+this.host);
 		this.gridSchedulerHost = gridSchedulerUrl;
@@ -98,10 +99,10 @@ public class Cluster implements Remote {
 			// the methods are exposed by the resource manager...
 			Registry registry = LocateRegistry.getRegistry(host);
 			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
-			System.out.println("Resource Manager registry is properly set up!");
+			logger.info("Resource Manager registry is properly set up!");
 
 		} catch (Exception e) {
-			System.err.println("Resource Manager registry wasn't set up: " + e.toString());
+			logger.error("Resource Manager registry wasn't set up: " + e.toString());
 			e.printStackTrace();
 		}
 
@@ -146,7 +147,7 @@ public class Cluster implements Remote {
 	}*/
 
 	public void stopPollThread() {
-		System.out.println("Stopping Cluster " + this.getUrl());
+		logger.error("Stopping Cluster " + this.getUrl());
 		try {
 			java.rmi.Naming.unbind(this.getUrl());
 		} catch (Exception e) {
@@ -157,6 +158,7 @@ public class Cluster implements Remote {
 		try {
 			pollingThread.join();
 		} catch (InterruptedException ex) {
+			logger.error("Cluster stopPollThread was interrupted");
 			assert (false) : "Cluster stopPollThread was interrupted";
 		}
 

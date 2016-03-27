@@ -13,7 +13,7 @@ public class RunCluster {
 		String gridSchedulerUrl = args[1];
 		int nodeCount = Integer.valueOf(args[2]);
 		
-		System.out.println("Launching cluster "+clusterUrl+" under gridscheduler: "+gridSchedulerUrl);
+		//System.out.println("Launching cluster "+clusterUrl+" under gridscheduler: "+gridSchedulerUrl);
 		
 		try {
 			Cluster cluster = new Cluster(clusterUrl, gridSchedulerUrl, nodeCount);

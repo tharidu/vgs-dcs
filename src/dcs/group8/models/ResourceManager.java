@@ -41,7 +41,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		this.jobEndTimes = new TreeMap<>();
 		/*System.out.println("The resource manager is created..");*/
 		myCluster = cl;
-		System.setProperty("logfilerm", "rm@"+myCluster.host);
+		//System.setProperty("logfilerm", "rm@"+myCluster.host);
 		logger = LogManager.getLogger(ResourceManager.class);
 		logger.info("The resource manager rm@"+myCluster.host+" was created");
 	}
@@ -63,9 +63,11 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 						.returnRegistry(myCluster.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsMessage(new JobMessage(job));
-				System.out.println("Job completion sent to GS from callback");
+			logger.info("Job with Job_id:"+job.getJobId()+" was completed");
 				break;
 			} catch (Exception e) {
+			//System.err.println("Communication with GS was not established: " + e.toString());
+			logger.error("Could not communicate with gs@"+myCluster.getGridSchedulerUrl());
 				try {
 					retry.errorOccured();
 				} catch (RetryException e1) {
@@ -75,7 +77,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		}
 
 		busyCount--;
-		System.out.println("Decreasing busy count " + busyCount);
+		logger.info("One more node is available now");
 	}
 
 	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
@@ -90,21 +92,30 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			}));
 			th.start();
 			busyCount++;
-			System.out.println("Adding busy count " + busyCount);
+			//System.out.println("Adding busy count "+busyCount);
+			logger.info("Adding a job to a node");
 		}
 		return "Job accepted by the resource manager and assigned to a node";
 	}
 
-	/*
-	 * @Override public String gsToRmJobMessage(JobMessage jbm) throws
-	 * RemoteException { if (busyCount < rmNodes) { for (int i = 0; i <
-	 * nodes.length; i++) { if (nodes[i] == null) { nodes[i] = new Node(); long
-	 * currentTime = new Date().getTime();
-	 * jbm.job.setJobStatus(JobStatus.Running);
-	 * jbm.job.setStartTimestamp(currentTime); nodes[i].setJob(jbm.job);
-	 * jobEndTimes.put(currentTime + jbm.job.getJobDuration(), i); } } } else {
-	 * // Send a message to GS that RM is full // Should never happen
-	 * System.err.println("RM full but job received"); } return "Job Accepted";
-	 * }
-	 */
+	/*@Override
+	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
+		if (busyCount < rmNodes) {
+			for (int i = 0; i < nodes.length; i++) {
+				if (nodes[i] == null) {
+					nodes[i] = new Node();
+					long currentTime = new Date().getTime();
+					jbm.job.setJobStatus(JobStatus.Running);
+					jbm.job.setStartTimestamp(currentTime);
+					nodes[i].setJob(jbm.job);
+					jobEndTimes.put(currentTime + jbm.job.getJobDuration(), i);
+				}
+			}
+		} else {
+			// Send a message to GS that RM is full
+			// Should never happen
+			System.err.println("RM full but job received");
+		}
+		return "Job Accepted";
+	}*/
 }
