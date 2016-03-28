@@ -54,7 +54,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		this.jobQueue = jobQueue;
 	}
 
-	// here you call the rmToGsMessage
+	// HERE WE CALL THE rmToGsMessage
 	public static void callBackHandler(Job job) {
 		RetryStrategy retry = new RetryStrategy();
 
@@ -67,7 +67,6 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 				retry.setSuccessfullyTried(true);
 				//break;
 			} catch (Exception e) {
-			//System.err.println("Communication with GS was not established: " + e.toString());
 				e.printStackTrace();
 				logger.error("Could not communicate with gs@"+myCluster.getGridSchedulerUrl());
 				logger.error(e.getMessage());

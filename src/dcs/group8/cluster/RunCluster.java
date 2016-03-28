@@ -6,17 +6,15 @@ public class RunCluster {
 
 	public static void main(String[] args) {
 		if(args.length < 3) {
-			System.err.println("Please provide id, grid scheduler url and no of nodes!");
+			System.err.println("Arguments format: <cluster_url> <primaryGS_url> <secondaryGS_url> <no_of_nodes_per_cluster>");
 			return;
 		}
 		String clusterUrl = args[0];
 		String gridSchedulerUrl = args[1];
-		int nodeCount = Integer.valueOf(args[2]);
-		
-		//System.out.println("Launching cluster "+clusterUrl+" under gridscheduler: "+gridSchedulerUrl);
-		
+		String  auxGridSchedulerUrl = args[2];
+		int nodeCount = Integer.valueOf(args[3]);	
 		try {
-			Cluster cluster = new Cluster(clusterUrl, gridSchedulerUrl, nodeCount);
+			Cluster cluster = new Cluster(clusterUrl, gridSchedulerUrl,auxGridSchedulerUrl, nodeCount);
 		}
 		catch (Exception e)
 		{

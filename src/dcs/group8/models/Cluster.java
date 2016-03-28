@@ -24,12 +24,13 @@ public class Cluster implements Remote {
 	private List<Node> nodes;
 	public String host;
 	private String gridSchedulerHost;
+	private String auxGridSchedulerHost;
 
 	// polling thread
 	private Thread pollingThread;
 //	private boolean running;
 
-	public Cluster(String url, String gridSchedulerUrl, int nodeCount) {
+	public Cluster(String url, String gridSchedulerUrl,String auxGridScheduler,int nodeCount) {
 		super();
 		this.host = url;
 		System.setProperty("logfilecluster", "cluster@"+this.host);
@@ -37,19 +38,13 @@ public class Cluster implements Remote {
 		logger = LogManager.getLogger(Cluster.class);
 		logger.info("Initializing cluster@"+this.host);
 		this.gridSchedulerHost = gridSchedulerUrl;
+		this.auxGridSchedulerHost = auxGridScheduler;
 		nodes = new ArrayList<Node>(nodeCount);
-		
 		logger.info("Creating a resource manager for this cluster with "+nodeCount+" nodes");
 		this.resourceManager = new ResourceManager(nodeCount,this);
 		this.backupResourceManager = new ResourceManager(nodeCount,this);
-
 		this.setUpRegistry();
 		this.informGS(this.host);
-
-		// start the polling thread
-//		running = true;
-		//pollingThread = new Thread(this);
-		//pollingThread.start();
 	}
 
 	public ResourceManager getResourceManager() {
