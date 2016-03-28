@@ -22,6 +22,9 @@ public interface GridSchedulerRemoteMessaging extends Remote {
 	//this message is send from an rm when it is back online
 	public void rmToGsStatusMessage(String clusterURL) throws RemoteException;
 	
+	//this message is send to inform the replica about the current status of the cluster
+	public void rmToGsStatusMessage(String clusterURL, int busyCount) throws RemoteException;
+	
 	//this a message from gs to gs to delegate a job to another grid scheduler
 	public void gsToGsJobMessage(JobMessage message) throws RemoteException;
 	

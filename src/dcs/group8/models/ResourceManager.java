@@ -1,5 +1,6 @@
 package dcs.group8.models;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.SortedMap;
@@ -22,7 +23,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	public Node[] nodes;
 	public SortedMap<Long, Integer> jobEndTimes;
 	public static int busyCount;
-	
+	private static String myGS;
 	private static Cluster myCluster;
 
 	/**
@@ -41,6 +42,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		this.jobEndTimes = new TreeMap<>();
 		/*System.out.println("The resource manager is created..");*/
 		myCluster = cl;
+		myGS = myCluster.getGridSchedulerUrl();
 		//System.setProperty("logfilerm", "rm@"+myCluster.host);
 		logger = LogManager.getLogger(ResourceManager.class);
 		logger.info("The resource manager rm@"+myCluster.host+" was created");
@@ -61,7 +63,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		while (retry.shouldRetry()) {
 			try {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
-						.returnRegistry(myCluster.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
+						.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsMessage(new JobMessage(job));
 				logger.info("Job with Job_id:"+job.getJobId()+" was completed");
 				retry.setSuccessfullyTried(true);
@@ -73,13 +75,47 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 				try {
 					retry.errorOccured();
 				} catch (RetryException e1) {
-					logger.error("Communication with GS was not established: " + e.toString());
+					// this is supposed to only happen when the primary grid scheduler is down and we need to communicate with the replica
+					logger.error("Communication with GS was not established..assuming that the gs@: "+myCluster.getGridSchedulerUrl()+" is offline" + e.toString());
+					logger.info("Trying to communicate with the auxiliary Grid Scheduler, gs@"+myCluster.getAuxGridSchedulerHost());
+					myGS = myCluster.getAuxGridSchedulerHost();
+					//first inform the replica grid scheduler about the status of the cluster
+					informReplicaGs();
+					callBackHandler(job);
 				}
 			}
 		}
 
 		busyCount--;
 		logger.info("One more node is available now");
+	}
+	
+	/**
+	 * In this method we send the data structures needed for the replica
+	 * grid scheduler to take on the the VO
+	 */
+	private static void informReplicaGs(){
+		RetryStrategy retry = new RetryStrategy();
+		
+		while(retry.shouldRetry()){
+			try {
+				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+						.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
+				//GsClusterStatus gsc = new GsClusterStatus(myCluster., cluUrl, nc, bc, status)
+				gs_stub.rmToGsStatusMessage(myCluster.getUrl(),busyCount);
+			}
+			catch (Exception e) {
+				logger.error("Unable to connect to replica gs@"+myGS);
+				e.printStackTrace();
+				try{
+					retry.errorOccured();
+				}
+				//THIS SHOULD NEVER HAPPEN ACTUALLY
+				catch(RetryException re){
+					logger.error("Maximum retries for connection to replica gs@"+myGS+" are reached , giving up...");
+				}
+			} 
+		}
 	}
 
 	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
