@@ -10,7 +10,11 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.ResourceManagerRemoteMessaging;
+import dcs.group8.utils.RegistryUtil;
+import dcs.group8.utils.RetryException;
+import dcs.group8.utils.RetryStrategy;
 
 public class Cluster implements Remote {
 	private static Logger logger;
@@ -40,6 +44,7 @@ public class Cluster implements Remote {
 		this.backupResourceManager = new ResourceManager(nodeCount,this);
 
 		this.setUpRegistry();
+		this.informGS(this.host);
 
 		// start the polling thread
 //		running = true;
@@ -85,6 +90,32 @@ public class Cluster implements Remote {
 
 	public void setGridSchedulerUrl(String gridSchedulerUrl) {
 		this.gridSchedulerHost = gridSchedulerUrl;
+	}
+	
+	/**
+	 * informGs is called to send a message to the GS of this
+	 * VO that the cluster and the Resource Manager are online
+	 */
+	private void informGS(String myURL){
+		logger.info("Sending a message to gs@"+this.gridSchedulerHost+" that i am up and running");
+		RetryStrategy retry = new RetryStrategy(100,1000);
+		while(retry.shouldRetry()){
+			try{
+				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+									.returnRegistry(gridSchedulerHost, "GridSchedulerRemoteMessaging");
+				gs_stub.rmToGsStatusMessage(myURL);
+			}
+			catch(Exception e){
+				try{
+					retry.errorOccured();
+				}
+				//TODO what happens when the cluster cannot reach the gs for a long time
+				catch (RetryException re){
+					logger.error("Maximum number of retries reached and gs@"+gridSchedulerHost+" did not respond");
+				}
+				
+			}
+		}
 	}
 
 	/**
@@ -146,7 +177,7 @@ public class Cluster implements Remote {
 		}
 	}*/
 
-	public void stopPollThread() {
+	public void stopPollThread() { 
 		logger.error("Stopping Cluster " + this.getUrl());
 		try {
 			java.rmi.Naming.unbind(this.getUrl());

@@ -1,23 +1,51 @@
 package dcs.group8.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class GsClusterStatus implements Serializable {
 	/**
-	 * 
+	 * GsClusterStatus is the object in which the grid schedulers
+	 * store any cluster related information they want to know
 	 */
 	private static final long serialVersionUID = -2966305870446790227L;
+	
 	private UUID clusterUUID;
 	private String clusterUrl;
 	private Integer nodeCount;
 	private Integer busyCount;
+	private boolean hasCrashed;
+	private ArrayList<Job> jobList;
 	
-	public GsClusterStatus(UUID id,String cluUrl, int nc,int bc){
+	public GsClusterStatus(UUID id,String cluUrl, int nc,int bc,boolean status){
 		clusterUUID = id;
 		clusterUrl = cluUrl;
 		nodeCount = nc;
 		busyCount = bc;
+		hasCrashed = status;
+		jobList = new ArrayList<Job>();
+	}
+	
+	
+	public void setJob(Job job){
+		this.jobList.add(job);
+	}
+	
+	public void removeJob(Job job){
+		// remove the job from the job list 
+		// when it is finished
+		int index = jobList.indexOf(job);
+		jobList.remove(index);
+	}
+
+
+	public boolean isHasCrashed() {
+		return hasCrashed;
+	}
+
+	public void setHasCrashed(boolean hasCrashed) {
+		this.hasCrashed = hasCrashed;
 	}
 	
 	public void decreaseBusyCount(){
