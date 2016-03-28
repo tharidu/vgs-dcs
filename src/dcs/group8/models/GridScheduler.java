@@ -66,7 +66,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	public void setBackupMyClusters(ArrayList<String> backupMyClusters) {
 		this.backupMyClusters = backupMyClusters;
 	}
-	
+
 	public GridScheduler(String backup) {
 		super();
 		backupHost = backup;
@@ -153,7 +153,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			logger.info("Initializing the status of the clusters");
 			for (int i = 0; i < myClusters.size(); i++) {
 				UUID id = UUID.randomUUID();
-				GsClusterStatus status = new GsClusterStatus(id, myClusters.get(i), nodesPerCluster, 0,false);
+				GsClusterStatus status = new GsClusterStatus(id, myClusters.get(i), nodesPerCluster, 0, false);
 				clusterStatus.put(id, status);
 			}
 		} catch (Exception e) {
@@ -161,12 +161,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * The polling thread monitors the queue of external jobs
-	 * in order to try and delegate them to other VOs if it succeeds
-	 * it sends the job to the appropriate gs or else it re-enters 
-	 * the job to the queue for a future try
+	 * The polling thread monitors the queue of external jobs in order to try
+	 * and delegate them to other VOs if it succeeds it sends the job to the
+	 * appropriate gs or else it re-enters the job to the queue for a future try
 	 */
 
 	@Override
@@ -199,13 +198,14 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 									acceptedGsUrl = gsUrl;
 								}
 								retry.setSuccessfullyTried(true);
-								//break;
+								// break;
 							} catch (Exception e) {
 								try {
 									retry.errorOccured();
-								//TODO how are we going to handle offline gridscheduler nodes here
+									// TODO how are we going to handle offline
+									// gridscheduler nodes here
 								} catch (RetryException e1) {
-									logger.error("Could not contact other gs@"+gsUrl+" to offload job");
+									logger.error("Could not contact other gs@" + gsUrl + " to offload job");
 									e.printStackTrace();
 								}
 							}
@@ -215,6 +215,23 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					if (acceptedGsUrl == "") {
 						externalJobs.add(job);
 						logger.info("No other GS is willing to take the job");
+					} else {
+						// Update aux GS about job removal from externalJobs
+						RetryStrategy retry = new RetryStrategy();
+
+						while (retry.shouldRetry()) {
+							try {
+								GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+										.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
+								gs_stub.backupExternalJobs(job, false);
+							} catch (Exception e) {
+								try {
+									retry.errorOccured();
+								} catch (RetryException e1) {
+									logger.error("Could not remove job entry from backup GS");
+								}
+							}
+						}
 					}
 
 					RetryStrategy retry = new RetryStrategy();
@@ -259,12 +276,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		clusterStatus.get(cid).decreaseBusyCount();
 		logger.info("Job with Job_id: " + message.job.getJobId() + " was completed from cluster@"
 				+ clusterStatus.get(cid).getClusterUrl());
-		//removing job from the list of jobs for this specific cluster
+		// removing job from the list of jobs for this specific cluster
 		clusterStatus.get(cid).removeJob(message.job);
 		RetryStrategy retry = new RetryStrategy();
-		
-		
-		//try to send a response to the client about the completion of this job
+
+		// try to send a response to the client about the completion of this job
 		while (retry.shouldRetry()) {
 			try {
 				ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) RegistryUtil.returnRegistry(clientid,
@@ -297,7 +313,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
 			// if he know that a cluster is already offline we continue looping
 			// over the rest of the clusters in the VO
-			if (entry.getValue().isHasCrashed()){
+			if (entry.getValue().isHasCrashed()) {
 				continue;
 			}
 			double utilization = entry.getValue().getBusyCount() / entry.getValue().getNodeCount();
@@ -329,7 +345,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					} catch (RetryException e1) {
 						logger.error("Communication with rm@" + selectedCluster.getValue().getClusterUrl()
 								+ " could not be established after 5 retries...the resource manager is offline");
-						//TODO an rm has crashed recover all the jobs that is currently running and set the correct cluster status
+						// TODO an rm has crashed recover all the jobs that is
+						// currently running and set the correct cluster status
 						selectedCluster.getValue().setHasCrashed(true);
 						e.printStackTrace();
 					}
@@ -337,15 +354,32 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			}
 			selectedCluster.getValue().setJob(jb.job);
 			return "JobMessage was received forwarding it to a resource manager";
-		} 
-		else {
+		} else {
 			// Send it to external queue, either everything is crashed!!
 			// or we could all the clusters in the VO are at their peak
 			// of their utilization
-			logger.info("Job with job_id: "+jb.job.getJobId()+" for client@"+jb.job.getClientUrl()+" is placed in the external jobs queue");
+			logger.info("Job with job_id: " + jb.job.getJobId() + " for client@" + jb.job.getClientUrl()
+					+ " is placed in the external jobs queue");
 			externalJobs.add(jb.job);
+
+			// backup to aux GS
+			RetryStrategy retry = new RetryStrategy();
+
+			while (retry.shouldRetry()) {
+				try {
+					GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+							.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
+					gs_stub.backupExternalJobs(jb.job, true);
+				} catch (Exception e) {
+					try {
+						retry.errorOccured();
+					} catch (RetryException e1) {
+						logger.error("Could not add the job to externalJobs in aux GS");
+					}
+				}
+			}
 		}
-		
+
 		return "JobMessage was received";
 	}
 
@@ -409,34 +443,28 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		return new StatusMessage(busyCount / (nodesPerCluster * this.myClusters.size()));
 	}
 
-	@Override
-	public void sendBackupGS(ConcurrentLinkedQueue<Job> externalJobs,
-			ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus, ArrayList<String> myClusters)
-			throws RemoteException {
-		backupExternalJobs = externalJobs;
-		backupClusterStatus = clusterStatus;
-		backupMyClusters = myClusters;
 
-	}
 	
 	/**
 	 * @param clusterURL: the url of the cluster for which the state is back online again
 	 */
 	@Override
 	public void rmToGsStatusMessage(String clusterURL) throws RemoteException {
-		//TODO check the cluster status for this specific cluster and update it to online
-		UUID key=null;
+		// TODO check the cluster status for this specific cluster and update it
+		// to online
+		UUID key = null;
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
-			if (entry.getValue().getClusterUrl().equals(clusterURL)){
+			if (entry.getValue().getClusterUrl().equals(clusterURL)) {
 				key = entry.getKey();
 				break;
 			}
 		}
-		if (key!=null){
+		if (key != null) {
 			clusterStatus.get(key).setHasCrashed(false);
 		}
-		
+
 	}
+
 
 	/**
 	 * @param clusterStatus the GsClusterStatus object which informs the replica about the current 
@@ -461,4 +489,17 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	
 	
 	
+
+	@Override
+	public void backupExternalJobs(Job job, boolean add) throws RemoteException {
+		if (add) {
+			externalJobs.add(job);
+			logger.info("Backup external job received");
+		} else {
+			externalJobs.remove(job);
+		}
+
+	}
+
+
 }
