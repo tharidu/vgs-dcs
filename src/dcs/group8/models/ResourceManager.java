@@ -63,15 +63,18 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 						.returnRegistry(myCluster.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsMessage(new JobMessage(job));
-			logger.info("Job with Job_id:"+job.getJobId()+" was completed");
-				break;
+				logger.info("Job with Job_id:"+job.getJobId()+" was completed");
+				retry.setSuccessfullyTried(true);
+				//break;
 			} catch (Exception e) {
 			//System.err.println("Communication with GS was not established: " + e.toString());
-			logger.error("Could not communicate with gs@"+myCluster.getGridSchedulerUrl());
+				e.printStackTrace();
+				logger.error("Could not communicate with gs@"+myCluster.getGridSchedulerUrl());
+				logger.error(e.getMessage());
 				try {
 					retry.errorOccured();
 				} catch (RetryException e1) {
-					System.err.println("Communication with GS was not established: " + e.toString());
+					logger.error("Communication with GS was not established: " + e.toString());
 				}
 			}
 		}

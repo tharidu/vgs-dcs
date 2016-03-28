@@ -35,8 +35,19 @@ public class GsClusterStatus implements Serializable {
 	public void removeJob(Job job){
 		// remove the job from the job list 
 		// when it is finished
-		int index = jobList.indexOf(job);
+		int index=0;
+		for (Job j : jobList){
+			if (j.getJobId().equals(job.getJobId())){
+				System.out.println("Found the job and breaking now");
+				break;
+			}
+			else{
+				index++;
+			}
+		}
+		System.out.println();
 		jobList.remove(index);
+		System.out.println("Removed job with index: "+index);
 	}
 
 

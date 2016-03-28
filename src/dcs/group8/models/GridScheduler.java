@@ -198,7 +198,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 									lowestUtilzation = reply.utilization;
 									acceptedGsUrl = gsUrl;
 								}
-								break;
+								retry.setSuccessfullyTried(true);
+								//break;
 							} catch (Exception e) {
 								try {
 									retry.errorOccured();
@@ -224,6 +225,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 									.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
 							gsm_stub.gsToGsJobMessage(new JobMessage(job));
 							logger.info("Job successfully sent to gs@" + acceptedGsUrl);
+							retry.setSuccessfullyTried(true);
 							// System.out.println("Job successfully sent to gs "
 							// +
 							// acceptedGsUrl);
@@ -268,6 +270,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 				ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) RegistryUtil.returnRegistry(clientid,
 						"ClientRemoteMessaging");
 				crm_stub.gsToClientMessage(message);
+				retry.setSuccessfullyTried(true);
 				break;
 			} catch (Exception e) {
 				try {
@@ -318,6 +321,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					jb.job.setClusterId(selectedCluster.getKey());
 					String ack = rm_stub.gsToRmJobMessage(jb);
 					logger.info("rm@" + selectedCluster.getValue().getClusterUrl() + " responded: " + ack);
+					retry.setSuccessfullyTried(true);
 					clusterStatus.get(selectedCluster.getKey()).increaseBusyCount();
 				} catch (Exception e) {
 					try {

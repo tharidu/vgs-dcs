@@ -104,6 +104,7 @@ public class Cluster implements Remote {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 									.returnRegistry(gridSchedulerHost, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsStatusMessage(myURL);
+				retry.setSuccessfullyTried(true);
 			}
 			catch(Exception e){
 				try{

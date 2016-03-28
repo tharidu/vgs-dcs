@@ -111,7 +111,7 @@ public class RunClient implements ClientRemoteMessaging{
 		try {
 			Registry registry = LocateRegistry.getRegistry(gsaddr);
 			GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
-			logger.info("[+] Submitting"+jb.toString()+" to gs@"+gsaddr);
+			logger.info("[+] Submitting "+job.toString()+" to gs@"+gsaddr);
 			String ack = clgs_stub.clientToGsMessage(jb);
 			logger.info("[+]Response from gs@"+gsaddr+":"+ack);
 			
