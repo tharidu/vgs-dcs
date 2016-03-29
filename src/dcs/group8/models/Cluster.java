@@ -47,6 +47,14 @@ public class Cluster implements Remote {
 		this.informGS(this.host);
 	}
 
+	public String getAuxGridSchedulerHost() {
+		return auxGridSchedulerHost;
+	}
+
+	public void setAuxGridSchedulerHost(String auxGridSchedulerHost) {
+		this.auxGridSchedulerHost = auxGridSchedulerHost;
+	}
+
 	public ResourceManager getResourceManager() {
 		return resourceManager;
 	}

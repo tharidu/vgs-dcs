@@ -443,6 +443,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		return new StatusMessage(busyCount / (nodesPerCluster * this.myClusters.size()));
 	}
 
+
+	
+	/**
+	 * @param clusterURL: the url of the cluster for which the state is back online again
+	 */
 	@Override
 	public void rmToGsStatusMessage(String clusterURL) throws RemoteException {
 		// TODO check the cluster status for this specific cluster and update it
@@ -460,6 +465,31 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 	}
 
+
+	/**
+	 * @param clusterStatus the GsClusterStatus object which informs the replica about the current 
+	 * status of the cluster in the VO after a crash of the initial grid scheduler
+	 */
+	
+	@Override
+	public void rmToGsStatusMessage(String clusterURL,int nodesBusy) throws RemoteException {
+		UUID key = null;
+		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
+			if (entry.getValue().getClusterUrl().equals(clusterURL)){
+				key = entry.getKey();
+				break;
+			}
+		}
+		if (key!=null){
+			clusterStatus.get(key).setBusyCount(nodesBusy);
+			clusterStatus.get(key).setHasCrashed(false);
+		}
+		
+	}
+	
+	
+	
+
 	@Override
 	public void backupExternalJobs(Job job, boolean add) throws RemoteException {
 		if (add) {
@@ -470,5 +500,6 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		}
 
 	}
+
 
 }
