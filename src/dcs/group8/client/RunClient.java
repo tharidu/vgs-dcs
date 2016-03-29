@@ -90,7 +90,7 @@ public class RunClient implements ClientRemoteMessaging{
 		//set in the system properties the file where the client should log info
 		System.setProperty("logfileclient", "client@"+myIpAddress);
 		logger = LogManager.getLogger(RunClient.class);
-		logger.info("Creatind a new client");
+		logger.info("Creating a new client");
 		RunClient cl = new RunClient();
 		try{
 			properties = PropertiesUtil.getProperties("dcs.group8.client.RunClient","gridschedulers.properties");
@@ -99,25 +99,42 @@ public class RunClient implements ClientRemoteMessaging{
 			logger.error("Could not read the properties file for the gridscheduler addresses");
 		}
 		String[] gsarr = properties.getProperty("gsaddr").split(";");
-		String gsaddr = "localhost";
+		
+		String gsaddr = "172.20.93.106";
+		
 		logger.info("Creating jobs to submit to the Distributed System");
 		cl.setUpRegistry();
-		Job job = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
-		//Job job1 = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
+		/*Job job = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
+		Job job1 = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
 		JobMessage jb = new JobMessage(job);
-		//JobMessage jb1 = new JobMessage(job1);
-		// System.out.println("Address of gs1 :"+cl.gsAddressesMap.get("gs1"));
+		JobMessage jb1 = new JobMessage(job1);*/
+		ArrayList<Job> jlist = new ArrayList<Job>();
+		for (int i=0;i<5;i++){
+			Random rand = new Random();
+			int duration = rand.nextInt(10000)+5000;
+			Job job = new Job(UUID.randomUUID(), duration, cl.myUUID, myIpAddress);
+			jlist.add(job);
+		}
 
 		try {
-			Registry registry = LocateRegistry.getRegistry(gsaddr);
+			
+			for (Job job : jlist){
+				Thread.sleep(1000);
+				Registry registry = LocateRegistry.getRegistry(gsaddr);
+				GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
+				logger.info("[+] Submitting "+job.toString()+" to gs@"+gsaddr);
+				String ack = clgs_stub.clientToGsMessage(new JobMessage(job));
+				logger.info("[+]Response from gs@"+gsaddr+":"+ack);
+			}
+			/*Registry registry = LocateRegistry.getRegistry(gsaddr);
 			GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
 			logger.info("[+] Submitting "+job.toString()+" to gs@"+gsaddr);
 			String ack = clgs_stub.clientToGsMessage(jb);
 			logger.info("[+]Response from gs@"+gsaddr+":"+ack);
 			
-			//logger.info("[+] Submitting"+jb.toString()+" to gs@"+gsaddr);
-			//String ack1 =clgs_stub.clientToGsMessage(jb1);
-			//logger.info("[+]Response from gs@"+gsaddr+":"+ack1);
+			logger.info("[+] Submitting"+job1.toString()+" to gs@"+gsaddr);
+			String ack1 =clgs_stub.clientToGsMessage(jb1);
+			logger.info("[+]Response from gs@"+gsaddr+":"+ack1);*/
 			/*try{
 				Thread.sleep(2000);
 				String ack1 =clgs_stub.clientToGsMessage(jb1);

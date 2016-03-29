@@ -2,8 +2,8 @@
 # Created by https://www.gitignore.io/api/java,eclipse
 
 ### log files ###
-.log
-
+logs
+resources
 ### Java ###
 *.class
 
