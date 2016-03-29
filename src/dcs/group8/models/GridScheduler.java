@@ -2,7 +2,6 @@ package dcs.group8.models;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -13,8 +12,10 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
@@ -69,7 +70,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		this.backupMyClusters = backupMyClusters;
 	}
 
-	public GridScheduler(String backup, boolean isBackup) {
+	public GridScheduler(boolean isBackup, String backup) {
 		super();
 		backupHost = backup;
 		this.isBackup = isBackup;
