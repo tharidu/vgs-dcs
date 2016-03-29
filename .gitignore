@@ -2,7 +2,11 @@
 # Created by https://www.gitignore.io/api/java,eclipse
 
 ### log files ###
+logs/
 .log
+
+## property files ##
+resources/
 
 ### Java ###
 *.class
@@ -70,4 +74,3 @@ local.properties
 
 # Code Recommenders
 .recommenders/
-
