@@ -24,22 +24,28 @@ import dcs.group8.utils.PropertiesUtil;
 
 /**
  * 
- * @author greg
- * An example Client trying to connect to a random
- * gridscheduler to submit a job to the DCS
+ * RunClient is the process representing the client
+ * that picks at random a GS from the distributed
+ * system and assigns jobs to it
+ * 
  */
 
 public class RunClient implements ClientRemoteMessaging{
 	
 	public static Logger logger;
+	private static Properties properties;
+	private static String myIpAddress;
 	
 	private HashMap<String,String> gsAddressesMap;
 	private InputStream inputstream;
-	private static Properties properties;
 	private String propFile;
 	private UUID myUUID;
-	private static String myIpAddress;
 	
+	/**
+	 * 
+	 * 
+	 * 
+	 */
 	public void gsToClientMessage(JobMessage jcm){
 		logger.info("My job with id: "+jcm.job.getJobId().toString()
 				+" was succesfully completed by Cluster: "+jcm.job.getClientId().toString());

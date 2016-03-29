@@ -4,11 +4,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * 
+ * GsClusterStatus is the object in which the grid schedulers
+ * store any cluster related information they want to know
+ * 
+ */
 public class GsClusterStatus implements Serializable {
-	/**
-	 * GsClusterStatus is the object in which the grid schedulers
-	 * store any cluster related information they want to know
-	 */
+	
 	private static final long serialVersionUID = -2966305870446790227L;
 	
 	private UUID clusterUUID;
@@ -18,6 +21,16 @@ public class GsClusterStatus implements Serializable {
 	private boolean hasCrashed;
 	private ArrayList<Job> jobList;
 	
+	/**
+	 * 
+	 * Initialization of GsClusterStatus object
+	 * @param id The UUID id of this cluster
+	 * @param cluUrl The cluster's url 
+	 * @param nc The number of nodes of this cluster
+	 * @param bc The number of busy nodes in this cluster
+	 * @param status The crash status of this cluster
+	 * 
+	 */
 	public GsClusterStatus(UUID id,String cluUrl, int nc,int bc,boolean status){
 		clusterUUID = id;
 		clusterUrl = cluUrl;
@@ -27,14 +40,25 @@ public class GsClusterStatus implements Serializable {
 		jobList = new ArrayList<Job>();
 	}
 	
-	
+	/**
+	 * 
+	 * Set a job in the list that is currently running in
+	 * the cluster. For fault tolerance reasons
+	 * @param job The Job object
+	 * 
+	 */
 	public void setJob(Job job){
 		this.jobList.add(job);
 	}
 	
+	/**
+	 * 
+	 * Remove a job that was completed by a node in this
+	 * cluster from the queue. For fault tolerance reasons
+	 * @param job
+	 * 
+	 */
 	public void removeJob(Job job){
-		// remove the job from the job list 
-		// when it is finished
 		int index=0;
 		for (Job j : jobList){
 			if (j.getJobId().equals(job.getJobId())){
@@ -45,12 +69,14 @@ public class GsClusterStatus implements Serializable {
 				index++;
 			}
 		}
-		System.out.println();
 		jobList.remove(index);
-		System.out.println("Removed job with index: "+index);
 	}
 
-
+	
+	
+	/*** GETTERS AND SETTERS ***/
+	
+	
 	public boolean isHasCrashed() {
 		return hasCrashed;
 	}

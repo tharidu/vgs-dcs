@@ -16,20 +16,35 @@ import dcs.group8.utils.RegistryUtil;
 import dcs.group8.utils.RetryException;
 import dcs.group8.utils.RetryStrategy;
 
+/**
+ * 
+ * 
+ * The cluster class represents the cluster entity of a VO
+ * which is under the responsibility of the grid scheduler
+ * in this particular VO
+ *
+ *
+ */
 public class Cluster implements Remote {
+	
 	private static Logger logger;
+	
+	public String host;
 	
 	private ResourceManager resourceManager;
 	private ResourceManager backupResourceManager;
 	private List<Node> nodes;
-	public String host;
 	private String gridSchedulerHost;
 	private String auxGridSchedulerHost;
-
-	// polling thread
 	private Thread pollingThread;
-//	private boolean running;
 
+	/**
+	 * 
+	 * @param url This cluster's url
+	 * @param gridSchedulerUrl The grid scheduler's url in the VO
+	 * @param auxGridScheduler The auxiliary grid scheduler url in the VO
+	 * @param nodeCount The number of nodes in the cluster
+	 */
 	public Cluster(String url, String gridSchedulerUrl,String auxGridScheduler,int nodeCount) {
 		super();
 		this.host = url;
@@ -46,7 +61,96 @@ public class Cluster implements Remote {
 		this.setUpRegistry();
 		this.informGS(this.host);
 	}
+	
+	/**
+	 *
+	 * informGs is called to send a message to the GS of this
+	 * VO that the cluster and the Resource Manager are online
+	 * this is called initially when the cluster is first initialized
+	 * and also when it recovers from a fault.
+	 * 
+	 * @param myURL The url of this cluster
+	 * 
+	 */
+	private void informGS(String myURL){
+		
+		logger.info("Sending a message to gs@"+this.gridSchedulerHost+" that i am up and running");
+		
+		RetryStrategy retry = new RetryStrategy(100,1000);
+		while(retry.shouldRetry()){
+			try{
+				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+									.returnRegistry(gridSchedulerHost, "GridSchedulerRemoteMessaging");
+				gs_stub.rmToGsStatusMessage(myURL);
+				retry.setSuccessfullyTried(true);
+			}
+			catch(Exception e){
+				try{
+					retry.errorOccured();
+				}
+				catch (RetryException re){
+					
+					logger.error("Maximum number of retries reached and gs@"+gridSchedulerHost+" did not respond");
+				
+				}
+			}
+		}
+	}
 
+	/**
+	 * 
+	 * Setup up the registry of the resource manager for all messages it must
+	 * handle from all entities of the DCS (Grid Schedulers)
+	 * 
+	 */
+	private void setUpRegistry() {
+
+		try {
+			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject
+					.exportObject(this.resourceManager, 0);
+			Registry registry = LocateRegistry.getRegistry(host);
+			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
+			
+			logger.info("Resource Manager registry is properly set up!");
+
+		} catch (Exception e) {
+			
+			logger.error("Resource Manager registry wasn't set up: " + e.toString());
+			
+			e.printStackTrace();
+		}
+
+	}
+
+	
+	/**
+	 * 
+	 * stopPollThread method is used to kill this specific cluster
+	 * and resource manager in order to test it for fault tolerance
+	 * 
+	 */
+	public void stopPollThread() { 
+		logger.error("Stopping Cluster " + this.getUrl());
+		try {
+			java.rmi.Naming.unbind(this.getUrl());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			pollingThread.join();
+		} catch (InterruptedException ex) {
+			logger.error("Cluster stopPollThread was interrupted");
+			assert (false) : "Cluster stopPollThread was interrupted";
+		}
+
+	}
+	
+	
+	
+	
+	
+	/*** GETTERS AND SETTERS METHODS ***/
+	
 	public String getAuxGridSchedulerHost() {
 		return auxGridSchedulerHost;
 	}
@@ -93,109 +197,5 @@ public class Cluster implements Remote {
 
 	public void setGridSchedulerUrl(String gridSchedulerUrl) {
 		this.gridSchedulerHost = gridSchedulerUrl;
-	}
-	
-	/**
-	 * informGs is called to send a message to the GS of this
-	 * VO that the cluster and the Resource Manager are online
-	 */
-	private void informGS(String myURL){
-		logger.info("Sending a message to gs@"+this.gridSchedulerHost+" that i am up and running");
-		RetryStrategy retry = new RetryStrategy(100,1000);
-		while(retry.shouldRetry()){
-			try{
-				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
-									.returnRegistry(gridSchedulerHost, "GridSchedulerRemoteMessaging");
-				gs_stub.rmToGsStatusMessage(myURL);
-				retry.setSuccessfullyTried(true);
-			}
-			catch(Exception e){
-				try{
-					retry.errorOccured();
-				}
-				//TODO what happens when the cluster cannot reach the gs for a long time
-				catch (RetryException re){
-					logger.error("Maximum number of retries reached and gs@"+gridSchedulerHost+" did not respond");
-				}
-				
-			}
-		}
-	}
-
-	/**
-	 * setup up the registry of the resource manager for all messages it must
-	 * handle from all entities of the DCS
-	 */
-	private void setUpRegistry() {
-
-		try {
-			ResourceManagerRemoteMessaging cgs_stub = (ResourceManagerRemoteMessaging) UnicastRemoteObject
-					.exportObject(this.resourceManager, 0);
-			// the methods are exposed by the resource manager...
-			Registry registry = LocateRegistry.getRegistry(host);
-			registry.bind(ResourceManagerRemoteMessaging.registry, cgs_stub);
-			logger.info("Resource Manager registry is properly set up!");
-
-		} catch (Exception e) {
-			logger.error("Resource Manager registry wasn't set up: " + e.toString());
-			e.printStackTrace();
-		}
-
-	}
-	
-	// in this thread we are checking for finished jobs in the resource manager 
-	// in order to notify the gridscheduler..
-	/*@Override
-	public void run() {
-		System.out.println("Starting Cluster " + this.getUrl());
-		while (running) {
-			for (Iterator<Map.Entry<Long, Integer>> it = this.resourceManager.jobEndTimes.entrySet().iterator(); it.hasNext();) {
-				Entry<Long, Integer> entry = it.next();
-				if (entry.getKey() <= new Date().getTime()) {
-					// Job done
-					this.resourceManager.busyCount--;
-					// we get the nodes structure from rm here concurrently?
-					Job job = this.resourceManager.nodes[entry.getValue()].getJob();
-					this.resourceManager.nodes[entry.getValue()] = null;
-					job.setEndTimestamp(new Date().getTime());
-					job.setJobStatus(JobStatus.Finished);
-					JobMessage jobMessage = new JobMessage(job);
-					it.remove();
-					try {
-						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
-								.returnRegistry(this.getGridSchedulerUrl(), "GridSchedulerRemoteMessaging");
-						gs_stub.rmToGsMessage(jobMessage);
-						System.out.println("Job completion sent to GS");
-					} catch (Exception e) {
-						System.err.println("Communication with GS was not established: " + e.toString());
-						e.printStackTrace();
-					}
-				}
-			}
-			
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException ex) {
-
-			}
-		}
-	}*/
-
-	public void stopPollThread() { 
-		logger.error("Stopping Cluster " + this.getUrl());
-		try {
-			java.rmi.Naming.unbind(this.getUrl());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-//		running = false;
-		try {
-			pollingThread.join();
-		} catch (InterruptedException ex) {
-			logger.error("Cluster stopPollThread was interrupted");
-			assert (false) : "Cluster stopPollThread was interrupted";
-		}
-
 	}
 }
