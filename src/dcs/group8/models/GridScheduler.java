@@ -313,10 +313,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
 			// if he know that a cluster is already offline we continue looping
 			// over the rest of the clusters in the VO
+//			System.out.println("Cluster " + entry.getKey() + " busy count - "+entry.getValue().getBusyCount()+" node count - " + entry.getValue().getNodeCount());
 			if (entry.getValue().isHasCrashed()) {
 				continue;
 			}
-			double utilization = entry.getValue().getBusyCount() / entry.getValue().getNodeCount();
+			double utilization = (double)entry.getValue().getBusyCount() / (double)entry.getValue().getNodeCount();
 			if (lowestUtilization > utilization) {
 				lowestUtilization = utilization;
 				selectedCluster = entry;
