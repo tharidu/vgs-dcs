@@ -7,7 +7,7 @@ public class RunGridScheduler {
 	public static void main(String[] args) {
 		System.out.println("Launching grid scheduler...");
 
-		if(args.length < 3) {
+		if(args.length < 2) {
 			System.err.println("Arguments format: <isBackup> <secondaryGS_url>");
 			return;
 		}
