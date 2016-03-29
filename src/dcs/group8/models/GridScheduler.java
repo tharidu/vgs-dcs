@@ -35,8 +35,6 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private ArrayList<String> gridschedulers;
 	private ArrayList<String> myClusters;
 	private int nodesPerCluster;
-	private ConcurrentHashMap<UUID, GsClusterStatus> backupClusterStatus;
-	private ArrayList<String> backupMyClusters;
 	private static Properties clusterProps;
 	private static Properties gsProps;
 	public boolean isBackup;
@@ -44,31 +42,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	// polling thread
 	private Thread pollingThread;
 	private boolean running;
-	private ConcurrentLinkedQueue<Job> backupExternalJobs;
 
-	public ConcurrentLinkedQueue<Job> getBackupExternalJobs() {
-		return backupExternalJobs;
-	}
-
-	public void setBackupExternalJobs(ConcurrentLinkedQueue<Job> backupExternalJobs) {
-		this.backupExternalJobs = backupExternalJobs;
-	}
-
-	public ConcurrentHashMap<UUID, GsClusterStatus> getBackupClusterStatus() {
-		return backupClusterStatus;
-	}
-
-	public void setBackupClusterStatus(ConcurrentHashMap<UUID, GsClusterStatus> backupClusterStatus) {
-		this.backupClusterStatus = backupClusterStatus;
-	}
-
-	public ArrayList<String> getBackupMyClusters() {
-		return backupMyClusters;
-	}
-
-	public void setBackupMyClusters(ArrayList<String> backupMyClusters) {
-		this.backupMyClusters = backupMyClusters;
-	}
 
 	public GridScheduler(boolean isBackup, String backup) {
 		super();
@@ -221,7 +195,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 						if (acceptedGsUrl == "") {
 							externalJobs.add(job);
 							logger.info("No other GS is willing to take the job");
-						} else {
+						} else if (this.getBackupHost() != "") {
 							// Update aux GS about job removal from externalJobs
 							RetryStrategy retry = new RetryStrategy();
 
@@ -386,18 +360,20 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			externalJobs.add(jb.job);
 
 			// backup to aux GS
-			RetryStrategy retry = new RetryStrategy();
+			if(this.getBackupHost() != "") {
+				RetryStrategy retry = new RetryStrategy();
 
-			while (retry.shouldRetry()) {
-				try {
-					GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
-							.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
-					gs_stub.backupExternalJobs(jb.job, true);
-				} catch (Exception e) {
+				while (retry.shouldRetry()) {
 					try {
-						retry.errorOccured();
-					} catch (RetryException e1) {
-						logger.error("Could not add the job to externalJobs in aux GS");
+						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+								.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
+						gs_stub.backupExternalJobs(jb.job, true);
+					} catch (Exception e) {
+						try {
+							retry.errorOccured();
+						} catch (RetryException e1) {
+							logger.error("Could not add the job to externalJobs in aux GS");
+						}
 					}
 				}
 			}
