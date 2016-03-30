@@ -326,9 +326,17 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					} catch (RetryException e1) {
 						logger.error("Communication with rm@" + selectedCluster.getValue().getClusterUrl()
 								+ " could not be established after 5 retries...the resource manager is offline");
+						logger.info("Trying to reschedule all the jobs for this resource manager");
 						// TODO an rm has crashed recover all the jobs that is
 						// currently running and set the correct cluster status
 						selectedCluster.getValue().setHasCrashed(true);
+						
+						/* SHOULD WE NOT RETRY HERE FINDING A CLUSTER THAT IS AVAILABLE TO TAKE THE JOB???*/
+						clientToGsMessage(jb);
+						
+						/* call the method to start a thread that it will  reschedule the jobs of this rm*/
+						rescheduleJobs(selectedCluster.getValue().getJobList());
+						
 						e.printStackTrace();
 					}
 				}
@@ -356,7 +364,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 						try {
 							retry.errorOccured();
 						} catch (RetryException e1) {
-							logger.error("Could not add the job to externalJobs in aux GS");
+							logger.error("Could not add the job to externalJobs in replica GS");
 						}
 					}
 				}
@@ -364,6 +372,20 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		}
 
 		return "JobMessage was received";
+	}
+	
+	
+	/**
+	 * 
+	 * A method that is called when the GS finds out about a crashed RM
+	 * it creates a new thread that is called periodically to schedule 
+	 * jobs from the start
+	 * 
+	 */
+	private void rescheduleJobs(ArrayList<Job> jlist){
+		RescheduleThread rt = new RescheduleThread(jlist, this);
+		Thread reThread = new Thread(rt);
+		reThread.start();
 	}
 
 	

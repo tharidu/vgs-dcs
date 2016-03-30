@@ -11,7 +11,7 @@ import java.util.UUID;
  * 
  */
 public class GsClusterStatus implements Serializable {
-	
+
 	private static final long serialVersionUID = -2966305870446790227L;
 	
 	private UUID clusterUUID;
@@ -76,6 +76,13 @@ public class GsClusterStatus implements Serializable {
 	
 	/*** GETTERS AND SETTERS ***/
 	
+	public ArrayList<Job> getJobList() {
+		return jobList;
+	}
+
+	public void setJobList(ArrayList<Job> jobList) {
+		this.jobList = jobList;
+	}
 	
 	public boolean isHasCrashed() {
 		return hasCrashed;
