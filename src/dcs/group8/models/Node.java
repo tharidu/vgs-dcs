@@ -3,19 +3,32 @@ package dcs.group8.models;
 import java.util.Date;
 
 
-//make the Node a thread that runs a job until it ends
+
+/**
+ * 
+ * 
+ * A node is a Thread running a specific duration and then
+ * call the callback function to signal the RM that it finished
+ *
+ */
 public class Node implements Runnable{
 	
 	private Job job;
 	private CallBack cb;
 	private long endtime;
-	//instantiate the node with a job to run
-	//and a callback function that is created
-	//by the resource manager
+	
+	/**
+	 * 
+	 * Constructor of a Node running a job in the cluster
+	 * @param job The Job that this node is running
+	 * @param cb The callback function to be called when the job is finished
+	 * 
+	 */
 	public Node(Job job,CallBack cb){
 		this.job = job;
 		this.cb = cb;
 	}
+	
 	
 	public void run(){
 		System.out.println(new Date().getTime());
@@ -30,6 +43,8 @@ public class Node implements Runnable{
 		this.cb.callback();
 	}
 	
+	
+	/*** GETTERS AND SETTERS ***/
 	public Job getJob() {
 		return job;
 	}

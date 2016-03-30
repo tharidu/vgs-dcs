@@ -4,11 +4,16 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
+
+/**
+ * 
+ *
+ * The Job object representing a job that is submitted to the DCS
+ *
+ *
+ */
 public class Job implements Serializable {
-	
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -1629778320006112305L;
 	private String clientUrl;
 	private UUID jobId;
@@ -20,6 +25,16 @@ public class Job implements Serializable {
 	private UUID clientId;
 	private UUID clusterId;
 	
+	
+	/**
+	 * 
+	 * Constructor of a Job object
+	 * @param jobId A UUID for the job
+	 * @param jobDuration The duration in millisecs for the job
+	 * @param clientId The id of the client submitting the job
+	 * @param clientUrl The url address of the client submitting the job
+	 * 
+	 */
 	public Job(UUID jobId, long jobDuration, UUID clientId, String clientUrl) {
 		this.clientUrl = clientUrl;
 		this.jobId = jobId;
@@ -29,12 +44,19 @@ public class Job implements Serializable {
 		this.jobStatus = JobStatus.Ready;
 	}
 	
+	
+	/**
+	 * 
+	 * A user friendly string representation of the Job object
+	 * 
+	 */
 	@Override
 	public String toString(){
 		return " Job_id: "+this.jobId+" from client@"+this.clientUrl+" ";
 		
 	}
 	
+	/***  GETTERS AND SETTERS METHODS  ***/
 	
 	public String getClientUrl() {
 		return clientUrl;

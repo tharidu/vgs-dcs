@@ -4,7 +4,7 @@ import dcs.group8.models.Job;
 
 /**
  * 
- * @author greg
+ * 
  * JobMessage is the message send from the client to 
  * the a GridScheduler of the DCS to submit a job
  * 

@@ -17,69 +17,74 @@ import dcs.group8.utils.RetryException;
 import dcs.group8.utils.RetryStrategy;
 
 public class ResourceManager implements ResourceManagerRemoteMessaging {
+	
 	private static Logger logger;
+	private static String myGS;
+	private static Cluster myCluster;
+	
 	private LinkedList<Job> jobQueue;
 	private int rmNodes;
+	
 	public Node[] nodes;
 	public SortedMap<Long, Integer> jobEndTimes;
 	public static int busyCount;
-	private static String myGS;
-	private static Cluster myCluster;
+	
 
 	/**
-	 * The message send from the gs to this cluster's RM
-	 * to get information about the status of the resources
-	 * returns the number of available resources(nodes) currently
-	 * in the cluster
+	 * 
+	 * Constructor method for the Resource Manager of a cluster in a VO
+	 * @param nodeCount integer denoting the number of nodes under rm's supervision
+	 * @param cl The cluster reference that this RM belongs
+	 * 
 	 */
-	public int gsToRmStatusMessage() {
-		return 5;
-	}
-
 	public ResourceManager(int nodeCount, Cluster cl) {
 		this.rmNodes = nodeCount;
 		this.nodes = new Node[nodeCount];
 		this.jobEndTimes = new TreeMap<>();
-		/*System.out.println("The resource manager is created..");*/
+		
 		myCluster = cl;
 		myGS = myCluster.getGridSchedulerUrl();
-		//System.setProperty("logfilerm", "rm@"+myCluster.host);
 		logger = LogManager.getLogger(ResourceManager.class);
 		logger.info("The resource manager rm@"+myCluster.host+" was created");
 	}
 
-	public LinkedList<Job> getJobQueue() {
-		return jobQueue;
-	}
 
-	public void setJobQueue(LinkedList<Job> jobQueue) {
-		this.jobQueue = jobQueue;
-	}
-
-	// HERE WE CALL THE rmToGsMessage
+	/**
+	 * 
+	 * callBackHandler is called when a job is finished in a node in the cluster
+	 * and it calls the rmToGsMessage method of the responsible GS
+	 * @param job The Job object associated with this callBackHandler
+	 * 
+	 */
 	public static void callBackHandler(Job job) {
+		
 		RetryStrategy retry = new RetryStrategy();
 
 		while (retry.shouldRetry()) {
 			try {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
-						.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
+													   .returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsMessage(new JobMessage(job));
+				
 				logger.info("Job with Job_id:"+job.getJobId()+" was completed");
+				
 				retry.setSuccessfullyTried(true);
-				//break;
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 				logger.error("Could not communicate with gs@"+myCluster.getGridSchedulerUrl());
 				logger.error(e.getMessage());
+				
 				try {
 					retry.errorOccured();
 				} catch (RetryException e1) {
-					// this is supposed to only happen when the primary grid scheduler is down and we need to communicate with the replica
+					
+					/* this is supposed to only happen when the primary grid scheduler is down and we need to communicate with the replica */
 					logger.error("Communication with GS was not established..assuming that the gs@: "+myCluster.getGridSchedulerUrl()+" is offline" + e.toString());
 					logger.info("Trying to communicate with the auxiliary Grid Scheduler, gs@"+myCluster.getAuxGridSchedulerHost());
 					myGS = myCluster.getAuxGridSchedulerHost();
-					//first inform the replica grid scheduler about the status of the cluster
+					
+					/* first inform the replica grid scheduler about the status of the cluster */
 					informReplicaGs();
 					callBackHandler(job);
 				}
@@ -89,10 +94,43 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		busyCount--;
 		logger.info("One more node is available now");
 	}
+
 	
 	/**
+	 * 
+	 * A Job has arrived from the GS to this RM, the RM creates a new
+	 * thread with the appropriate callBackHandler set to signal the end 
+	 * of the job after the specified job duration
+	 * 
+	 */
+	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
+		
+		/* DO WE NEED TO CHECK FOR THE BUSYCOUNT HERE */
+		if (busyCount < rmNodes) {
+			Thread th = new Thread(new Node(jbm.job, new CallBack() {
+
+				@Override
+				public void callback() {
+					callBackHandler(jbm.job);
+
+				}
+			}));
+			th.start();
+			busyCount++;
+			
+			logger.info("Adding job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
+		}
+		return "Job accepted by the resource manager and assigned to a node";
+	}
+	
+	
+	/**
+	 * 
 	 * In this method we send the data structures needed for the replica
-	 * grid scheduler to take on the the VO
+	 * grid scheduler to take on the management of the VO this method should
+	 * be called only when this RM's GS url is changed to the one where 
+	 * the replica GS is located
+	 * 
 	 */
 	private static void informReplicaGs(){
 		RetryStrategy retry = new RetryStrategy();
@@ -100,8 +138,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		while(retry.shouldRetry()){
 			try {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
-						.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
-				//GsClusterStatus gsc = new GsClusterStatus(myCluster., cluUrl, nc, bc, status)
+														.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsStatusMessage(myCluster.getUrl(),busyCount);
 			}
 			catch (Exception e) {
@@ -117,43 +154,26 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			} 
 		}
 	}
-
-	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
-		if (busyCount < rmNodes) {
-			Thread th = new Thread(new Node(jbm.job, new CallBack() {
-
-				@Override
-				public void callback() {
-					callBackHandler(jbm.job);
-
-				}
-			}));
-			th.start();
-			busyCount++;
-			//System.out.println("Adding busy count "+busyCount);
-			logger.info("Adding a job to a node");
-		}
-		return "Job accepted by the resource manager and assigned to a node";
+	
+	
+	/**
+	 * WE DO NOT NEED THIS YET
+	 */
+	@Override
+	public int gsToRmStatusMessage() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	
+	
+	/*** GETTERS AND SETTERS ***/
+	public LinkedList<Job> getJobQueue() {
+		return jobQueue;
 	}
 
-	/*@Override
-	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
-		if (busyCount < rmNodes) {
-			for (int i = 0; i < nodes.length; i++) {
-				if (nodes[i] == null) {
-					nodes[i] = new Node();
-					long currentTime = new Date().getTime();
-					jbm.job.setJobStatus(JobStatus.Running);
-					jbm.job.setStartTimestamp(currentTime);
-					nodes[i].setJob(jbm.job);
-					jobEndTimes.put(currentTime + jbm.job.getJobDuration(), i);
-				}
-			}
-		} else {
-			// Send a message to GS that RM is full
-			// Should never happen
-			System.err.println("RM full but job received");
-		}
-		return "Job Accepted";
-	}*/
+	public void setJobQueue(LinkedList<Job> jobQueue) {
+		this.jobQueue = jobQueue;
+	}
+
 }

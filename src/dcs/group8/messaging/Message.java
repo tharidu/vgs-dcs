@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 /**
  * 
- * @author greg
- * This is the base message class
+ * 
+ * This is the base message class that is serializable
  *
  */
 

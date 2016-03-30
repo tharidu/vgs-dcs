@@ -20,6 +20,7 @@ import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
 import dcs.group8.messaging.JobMessage;
 import dcs.group8.models.Job;
+import dcs.group8.models.JobFactory;
 import dcs.group8.utils.PropertiesUtil;
 
 /**
@@ -42,36 +43,35 @@ public class RunClient implements ClientRemoteMessaging{
 	private UUID myUUID;
 	
 	/**
-	 * 
-	 * 
+	 * This method is called from a GS to inform a client about 
+	 * the completion of a job that he submitted
+	 * @param jcm JobMessage containing the job
 	 * 
 	 */
 	public void gsToClientMessage(JobMessage jcm){
 		logger.info("My job with id: "+jcm.job.getJobId().toString()
-				+" was succesfully completed by Cluster: "+jcm.job.getClientId().toString());
+				    +" was succesfully completed by cluster@: "+jcm.job.getClientUrl().toString());
 	}
+
 	
-	private void setUpRegistry(){
-		
-		try{
-			ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
-			Registry registry = LocateRegistry.getRegistry();
-			registry.bind(ClientRemoteMessaging.registry, crm_stub);
-			logger.info("Client registry is properly set up");
-		}
-		catch(Exception e){
-			logger.error("Client registry wasn't set up: "+e.toString());
-			e.printStackTrace();
-		}
-	}
-	
-	//create a client with the path to the properties file
+	/**
+	 * 
+	 * Constructor method of the client where it initializes
+	 * the GS addresses HashMap and assigns an id to himself
+	 * 
+	 */
 	public RunClient(){
 		logger.info("Initializing client's data structures");
 		this.gsAddressesMap = new HashMap<String, String>();
 		this.myUUID = UUID.randomUUID();
 	}
 
+	
+	/**
+	 * 
+	 * @param gsaddr An array of string url addresses of the GS
+	 * @return String a randomly selected address of a GS in the DCS
+	 */
 	private String getRandomGs(String[] gsaddr){
 		String randomaddr = gsaddr[new Random().nextInt(gsaddr.length)];
 		return randomaddr;
@@ -85,6 +85,13 @@ public class RunClient implements ClientRemoteMessaging{
 		
 	}
 	
+	
+	/**
+	 * 
+	 * Main method of the client jobs are created and submitted to the DCS
+	 * @param args
+	 * 
+	 */
 	public static void main(String[] args){
 		
 		try{
@@ -93,11 +100,13 @@ public class RunClient implements ClientRemoteMessaging{
 		catch(UnknownHostException ue){
 			ue.printStackTrace();
 		}
-		//set in the system properties the file where the client should log info
+		
 		System.setProperty("logfileclient", "client@"+myIpAddress);
 		logger = LogManager.getLogger(RunClient.class);
 		logger.info("Creating a new client");
+		
 		RunClient cl = new RunClient();
+		
 		try{
 			properties = PropertiesUtil.getProperties("dcs.group8.client.RunClient","gridschedulers.properties");
 		}
@@ -109,17 +118,14 @@ public class RunClient implements ClientRemoteMessaging{
 		String gsaddr = "172.20.93.106";
 		
 		logger.info("Creating jobs to submit to the Distributed System");
-		cl.setUpRegistry();
-		/*Job job = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
-		Job job1 = new Job(UUID.randomUUID(), 10000, cl.myUUID, myIpAddress);
-		JobMessage jb = new JobMessage(job);
-		JobMessage jb1 = new JobMessage(job1);*/
+		cl.setUpRegistry();	
+		
+		
+		/*** Create a number of jobs here and add them to a list to submit them in the DCS ***/
 		ArrayList<Job> jlist = new ArrayList<Job>();
+		JobFactory jobFactory = new JobFactory(cl.myUUID,5000,10000,myIpAddress);
 		for (int i=0;i<5;i++){
-			Random rand = new Random();
-			int duration = rand.nextInt(10000)+5000;
-			Job job = new Job(UUID.randomUUID(), duration, cl.myUUID, myIpAddress);
-			jlist.add(job);
+			jlist.add(jobFactory.createJob());
 		}
 
 		try {
@@ -128,31 +134,33 @@ public class RunClient implements ClientRemoteMessaging{
 				Thread.sleep(1000);
 				Registry registry = LocateRegistry.getRegistry(gsaddr);
 				GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
+				
 				logger.info("[+] Submitting "+job.toString()+" to gs@"+gsaddr);
-				String ack = clgs_stub.clientToGsMessage(new JobMessage(job));
+				
+				String ack = clgs_stub.clientToGsMessage(JobFactory.createMessage(job));
+				
 				logger.info("[+]Response from gs@"+gsaddr+":"+ack);
 			}
-			/*Registry registry = LocateRegistry.getRegistry(gsaddr);
-			GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
-			logger.info("[+] Submitting "+job.toString()+" to gs@"+gsaddr);
-			String ack = clgs_stub.clientToGsMessage(jb);
-			logger.info("[+]Response from gs@"+gsaddr+":"+ack);
-			
-			logger.info("[+] Submitting"+job1.toString()+" to gs@"+gsaddr);
-			String ack1 =clgs_stub.clientToGsMessage(jb1);
-			logger.info("[+]Response from gs@"+gsaddr+":"+ack1);*/
-			/*try{
-				Thread.sleep(2000);
-				String ack1 =clgs_stub.clientToGsMessage(jb1);
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}*/
 		}
 		catch (Exception e ){
 			logger.error("Rmi exception occured could not submit jobs to gs@"+gsaddr);
 			e.printStackTrace();
 		}
 
+	}
+	
+	
+	private void setUpRegistry(){
+		
+		try{
+			ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) UnicastRemoteObject.exportObject(this,0);
+			Registry registry = LocateRegistry.getRegistry();
+			registry.bind(ClientRemoteMessaging.registry, crm_stub);
+			logger.info("Client registry is properly set up");
+		}
+		catch(Exception e){
+			logger.error("Client registry wasn't set up: "+e.toString());
+			e.printStackTrace();
+		}
 	}
 }
