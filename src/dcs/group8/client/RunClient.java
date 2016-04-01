@@ -34,6 +34,7 @@ import dcs.group8.utils.PropertiesUtil;
 public class RunClient implements ClientRemoteMessaging{
 	
 	public static Logger logger;
+	public static int numberOfJobs;
 	private static Properties properties;
 	private static String myIpAddress;
 	
@@ -94,6 +95,12 @@ public class RunClient implements ClientRemoteMessaging{
 	 */
 	public static void main(String[] args){
 		
+		if (args.length<1){
+			System.err.println("The number of jobs to be submitted by the client must be provided as an argument");
+			System.exit(-1);
+		}
+		
+		
 		try{
 			myIpAddress = InetAddress.getLocalHost().getHostAddress();
 		}
@@ -106,6 +113,7 @@ public class RunClient implements ClientRemoteMessaging{
 		logger.info("Creating a new client");
 		
 		RunClient cl = new RunClient();
+		numberOfJobs = Integer.parseInt(args[0]);
 		
 		try{
 			properties = PropertiesUtil.getProperties("dcs.group8.client.RunClient","gridschedulers.properties");
@@ -124,7 +132,7 @@ public class RunClient implements ClientRemoteMessaging{
 		/*** Create a number of jobs here and add them to a list to submit them in the DCS ***/
 		ArrayList<Job> jlist = new ArrayList<Job>();
 		JobFactory jobFactory = new JobFactory(cl.myUUID,5000,10000,myIpAddress);
-		for (int i=0;i<5;i++){
+		for (int i=0;i<numberOfJobs;i++){
 			jlist.add(jobFactory.createJob());
 		}
 
