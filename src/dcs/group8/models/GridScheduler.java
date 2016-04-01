@@ -83,7 +83,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		
 		
 		setExternalJobs(new ConcurrentLinkedQueue<Job>());
-		setClusterStatus(new ConcurrentHashMap<>());
+		setClusterStatus(new ConcurrentHashMap<UUID, GsClusterStatus>());
 		gridSchedulerInit();
 		setUpRegistry();
 		running = true;
@@ -519,8 +519,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		return clusterStatus;
 	}
 
-	public void setClusterStatus(ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus) {
-		this.clusterStatus = clusterStatus;
+	public void setClusterStatus(ConcurrentHashMap<UUID, GsClusterStatus> concurrentHashMap) {
+		this.clusterStatus = concurrentHashMap;
 	}
 
 	public ConcurrentLinkedQueue<Job> getExternalJobs() {

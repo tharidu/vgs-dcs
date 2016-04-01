@@ -103,7 +103,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	 * of the job after the specified job duration
 	 * 
 	 */
-	public String gsToRmJobMessage(JobMessage jbm) throws RemoteException {
+	public String gsToRmJobMessage(final JobMessage jbm) throws RemoteException {
 		
 		/* DO WE NEED TO CHECK FOR THE BUSYCOUNT HERE */
 		if (busyCount < rmNodes) {
