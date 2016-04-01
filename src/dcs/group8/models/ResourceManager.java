@@ -40,7 +40,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	public ResourceManager(int nodeCount, Cluster cl) {
 		this.rmNodes = nodeCount;
 		this.nodes = new Node[nodeCount];
-		this.jobEndTimes = new TreeMap<>();
+		this.jobEndTimes = new TreeMap<Long, Integer>();
 		
 		myCluster = cl;
 		myGS = myCluster.getGridSchedulerUrl();
