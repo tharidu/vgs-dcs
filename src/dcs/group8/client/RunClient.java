@@ -123,7 +123,7 @@ public class RunClient implements ClientRemoteMessaging{
 		}
 		String[] gsarr = properties.getProperty("gsaddr").split(";");
 		
-		String gsaddr = "172.20.93.106";
+		String gsaddr = cl.getRandomGs(gsarr);
 		
 		logger.info("Creating jobs to submit to the Distributed System");
 		cl.setUpRegistry();	
