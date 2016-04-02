@@ -1,13 +1,9 @@
 #!/bin/bash
 
-for node in $@
+while read node
 do 
-	echo -e "For cluster@$node enter primary GS url: \c"
-	read primaryGs
-	echo -e "For cluster@$node enter replica GS url: \c"
-	read replicaGs
-	echo -e "For cluster@$node enter number of node: \c"
-	read noNodes
-	echo "Starting a cluster@$node"
-	ssh $node "./cluster.sh $node $primaryGs $replicaGs $noNodes"
+	set $node
+	echo -e "$node"
+	echo "Starting a cluster@$1"
+	ssh $1 -n "./cluster.sh $1 $2 $3 $4 > /tmp/cluster 2>&1 &"
 done 	

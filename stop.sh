@@ -4,3 +4,4 @@ do
 	echo "killing all processes in all nodes"
 	ssh $node "pkill -f group8"
 done
+./stopRmi.sh

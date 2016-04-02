@@ -5,4 +5,4 @@ then
 	exit 1
 fi
 echo "Running client at $1 with $2 jobs"
-ssh $1 "./client.sh $2"
+ssh $1 -n "./client.sh $2"
