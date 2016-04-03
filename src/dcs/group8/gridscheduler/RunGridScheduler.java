@@ -1,5 +1,7 @@
 package dcs.group8.gridscheduler;
 
+import java.util.Arrays;
+
 import dcs.group8.models.GridScheduler;
 
 
@@ -21,20 +23,17 @@ public class RunGridScheduler {
 	public static void main(String[] args) {
 		System.out.println("Launching grid scheduler...");
 
-		if(args.length < 1) {
-			System.err.println("Arguments format: <isBackup> <secondaryGS_url> or Arguments format: <isBackup>");
+		if(args.length < 3) {
+			System.err.println("Arguments format: <isBackup> <secondaryGS_url> <noNodesPerCluster> <cluster1> <cluster2> ...");
 			return;
 		}
 		
 		boolean isBackup = Boolean.valueOf(args[0]);
-		String backupGridSchedulerUrl = "";
+		String backupGridSchedulerUrl = args[1];
+		int noNodes = Integer.valueOf(args[2]);
 		
-		if(args.length == 2) {
-			backupGridSchedulerUrl = args[1];	
-		}
-				
 		try {
-			GridScheduler gridScheduler = new GridScheduler(isBackup, backupGridSchedulerUrl);
+			GridScheduler gridScheduler = new GridScheduler(isBackup, backupGridSchedulerUrl, noNodes, Arrays.copyOfRange(args, 2, args.length));
 		} catch (Exception e) {
 
 		}

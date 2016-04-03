@@ -60,10 +60,12 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 * @param backup The replica GS url in case this is a primary GS
 	 * 
 	 */
-	public GridScheduler(boolean isBackup, String backup) {
+	public GridScheduler(boolean isBackup, String backup, int noNodes, String[] clusters) {
 		super();
 		backupHost = backup;
 		this.isBackup = isBackup;
+		this.nodesPerCluster = noNodes;
+		this.myClusters = (ArrayList<String>) Arrays.asList(clusters);
 
 		try {
 			this.host = InetAddress.getLocalHost().getHostAddress();
@@ -100,7 +102,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		logger.info("Reading properties files for clusters and grid schedulers");
 		gridschedulers = new ArrayList<String>();
 		try {
-			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
+//			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
 			gsProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
 			for (String gsAddr : gsProps.getProperty("gsaddr").split(";")) {
 				if (InetAddress.getLocalHost().getHostAddress() == gsAddr) {
@@ -109,8 +111,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					gridschedulers.add(gsAddr);
 				}
 			}
-			myClusters = new ArrayList<String>(Arrays.asList(clusterProps.getProperty("claddr").split(";")));
-			nodesPerCluster = Integer.parseInt(clusterProps.getProperty("nodes"));
+//			myClusters = new ArrayList<String>(Arrays.asList(clusterProps.getProperty("claddr").split(";")));
+//			nodesPerCluster = Integer.parseInt(clusterProps.getProperty("nodes"));
 			
 			logger.info("Initializing the status of the clusters");
 			
