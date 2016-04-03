@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,10 +66,10 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		backupHost = backup;
 		this.isBackup = isBackup;
 		this.nodesPerCluster = noNodes;
-		this.myClusters = (ArrayList<String>) Arrays.asList(clusters);
+		this.myClusters = new ArrayList<String>(Arrays.asList(clusters));
 
 		try {
-			this.host = InetAddress.getLocalHost().getHostAddress();
+			this.host = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -159,7 +160,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			
 			try {
 				Thread.sleep(1000);
-				reportBusyCount();
+				//reportBusyCount();
 				if (!isBackup) {
 					Job job = externalJobs.poll();
 					if (job != null) {

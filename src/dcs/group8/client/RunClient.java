@@ -37,6 +37,7 @@ public class RunClient implements ClientRemoteMessaging{
 	public static int numberOfJobs;
 	private static Properties properties;
 	private static String myIpAddress;
+	private static int index = 0;
 	
 	private HashMap<String,String> gsAddressesMap;
 	private InputStream inputstream;
@@ -51,7 +52,7 @@ public class RunClient implements ClientRemoteMessaging{
 	 */
 	public void gsToClientMessage(JobMessage jcm){
 		logger.info("My job with id: "+jcm.job.getJobId().toString()
-				    +" was succesfully completed by cluster@: "+jcm.job.getClientUrl().toString());
+				    +" was succesfully completed by cluster@: "+jcm.job.getClusterId().toString());
 	}
 
 	
@@ -71,11 +72,14 @@ public class RunClient implements ClientRemoteMessaging{
 	/**
 	 * 
 	 * @param gsaddr An array of string url addresses of the GS
-	 * @return String a randomly selected address of a GS in the DCS
+	 * @return String a round robin selected address of a GS in the DCS
 	 */
-	private String getRandomGs(String[] gsaddr){
-		String randomaddr = gsaddr[new Random().nextInt(gsaddr.length)];
-		return randomaddr;
+	private String getRoundRobinGs(String[] gsaddr){
+		if (index  >=gsaddr.length){
+			index = 0;
+
+		}
+		return gsaddr[index++];
 	}
 
 	private String getRandomGsAddress(){
@@ -123,8 +127,6 @@ public class RunClient implements ClientRemoteMessaging{
 		}
 		String[] gsarr = properties.getProperty("gsaddr").split(";");
 		
-		String gsaddr = cl.getRandomGs(gsarr);
-		
 		logger.info("Creating jobs to submit to the Distributed System");
 		cl.setUpRegistry();	
 		
@@ -135,11 +137,12 @@ public class RunClient implements ClientRemoteMessaging{
 		for (int i=0;i<numberOfJobs;i++){
 			jlist.add(jobFactory.createJob());
 		}
-
+		String gsaddr="";
 		try {
 			
 			for (Job job : jlist){
 				Thread.sleep(1000);
+				gsaddr = cl.getRoundRobinGs(gsarr);
 				Registry registry = LocateRegistry.getRegistry(gsaddr);
 				GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
 				

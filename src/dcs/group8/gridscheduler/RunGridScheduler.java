@@ -33,9 +33,9 @@ public class RunGridScheduler {
 		int noNodes = Integer.valueOf(args[2]);
 		
 		try {
-			GridScheduler gridScheduler = new GridScheduler(isBackup, backupGridSchedulerUrl, noNodes, Arrays.copyOfRange(args, 2, args.length));
+			GridScheduler gridScheduler = new GridScheduler(isBackup, backupGridSchedulerUrl, noNodes, Arrays.copyOfRange(args, 3, args.length));
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
