@@ -36,13 +36,13 @@ import dcs.group8.utils.RetryStrategy;
 public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	
 	private static Logger logger;
-	private static Properties clusterProps;
+//	private static Properties clusterProps;
 	private static Properties gsProps;
 	
 	private String host;
 	private String backupHost;
 	private ConcurrentLinkedQueue<Job> externalJobs;
-	private ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus;
+	private static ConcurrentHashMap<UUID, GsClusterStatus> clusterStatus;
 	private ArrayList<String> gridschedulers;
 	private ArrayList<String> myClusters;
 	private int nodesPerCluster;
@@ -127,6 +127,21 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		}
 	}
 
+	
+	/**
+	 * 
+	 * reportBusyCount is only used for the load balancing experiments
+	 * of our distributed system
+	 * 
+	 */
+	private void reportBusyCount(){
+		String message = "VO load status";
+		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
+			message+= ","+entry.getValue().getClusterUrl()+","+entry.getValue().getBusyCount().toString();
+		}
+		logger.debug(message);
+	}
+	
 	/**
 	 * 
 	 * The polling thread monitors the queue of external jobs in order to try
@@ -144,7 +159,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			
 			try {
 				Thread.sleep(1000);
-
+				reportBusyCount();
 				if (!isBackup) {
 					Job job = externalJobs.poll();
 					if (job != null) {
