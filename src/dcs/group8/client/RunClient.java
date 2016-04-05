@@ -15,6 +15,8 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.uncommons.maths.random.ExponentialGenerator;
+import org.uncommons.maths.random.MersenneTwisterRNG;
 
 import dcs.group8.messaging.ClientRemoteMessaging;
 import dcs.group8.messaging.GridSchedulerRemoteMessaging;
@@ -139,9 +141,19 @@ public class RunClient implements ClientRemoteMessaging{
 		}
 		String gsaddr="";
 		try {
+			// One minute
+			final long timePeriod = 60000;
+			Random rng = new MersenneTwisterRNG();
+
+			// Generate events at an average rate of 20 per minute.
+			ExponentialGenerator gen = new ExponentialGenerator(20, rng);
 			
 			for (Job job : jlist){
-				Thread.sleep(1000);
+//				Thread.sleep(1000);
+				
+				long interval = Math.round(gen.nextValue() * timePeriod);
+			    Thread.sleep(interval);
+			    
 				gsaddr = cl.getRoundRobinGs(gsarr);
 				Registry registry = LocateRegistry.getRegistry(gsaddr);
 				GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
