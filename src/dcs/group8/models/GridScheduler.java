@@ -106,7 +106,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 //			clusterProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "clusters.properties");
 			gsProps = PropertiesUtil.getProperties("dcs.group8.models.GridScheduler", "gridschedulers.properties");
 			for (String gsAddr : gsProps.getProperty("gsaddr").split(";")) {
-				if (InetAddress.getLocalHost().getHostAddress() == gsAddr) {
+				if (InetAddress.getLocalHost().getHostName().equals(gsAddr)) {
 					continue;
 				} else {
 					gridschedulers.add(gsAddr);
@@ -160,7 +160,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			
 			try {
 				Thread.sleep(1000);
-				//reportBusyCount();
+				reportBusyCount();
 				if (!isBackup) {
 					Job job = externalJobs.poll();
 					if (job != null) {
@@ -198,10 +198,10 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 							}
 						}
 
-						if (acceptedGsUrl == "") {
+						if (acceptedGsUrl.equals("")) {
 							externalJobs.add(job);
 							logger.info("No other GS is willing to take the job");
-						} else if (this.getBackupHost() != "") {
+						} else if (!this.getBackupHost().equals("")) {
 							// Update aux GS about job removal from externalJobs
 							RetryStrategy retry = new RetryStrategy();
 
@@ -220,21 +220,23 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 							}
 						}
 
-						RetryStrategy retry = new RetryStrategy();
+						if (!acceptedGsUrl.equals("")) {
+							RetryStrategy retry = new RetryStrategy();
 
-						while (retry.shouldRetry()) {
-							try {
-								GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
-										.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
-								gsm_stub.gsToGsJobMessage(new JobMessage(job));
-								logger.info("Job successfully sent to gs@" + acceptedGsUrl);
-								retry.setSuccessfullyTried(true);
-							} catch (Exception e) {
+							while (retry.shouldRetry()) {
 								try {
-									retry.errorOccured();
-								} catch (RetryException e1) {
-									logger.error("Could not offload the job to selected GS");
-									e.printStackTrace();
+									GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
+											.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
+									gsm_stub.gsToGsJobMessage(new JobMessage(job));
+									logger.info("Job successfully sent to gs@" + acceptedGsUrl);
+									retry.setSuccessfullyTried(true);
+								} catch (Exception e) {
+									try {
+										retry.errorOccured();
+									} catch (RetryException e1) {
+										logger.error("Could not offload the job to selected GS");
+										e.printStackTrace();
+									}
 								}
 							}
 						}
@@ -370,7 +372,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			externalJobs.add(jb.job);
 
 			// backup to aux GS
-			if(this.getBackupHost() != "") {
+			if(!this.getBackupHost().equals("")) {
 				RetryStrategy retry = new RetryStrategy();
 
 				while (retry.shouldRetry()) {

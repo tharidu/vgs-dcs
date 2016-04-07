@@ -119,6 +119,8 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			busyCount++;
 			
 			logger.info("Adding job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
+		} else {
+			logger.info("Lost job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
 		}
 		return "Job accepted by the resource manager and assigned to a node";
 	}

@@ -32,6 +32,10 @@ public class RunGridScheduler {
 		String backupGridSchedulerUrl = args[1];
 		int noNodes = Integer.valueOf(args[2]);
 		
+		if(backupGridSchedulerUrl.equals("fake")){
+			backupGridSchedulerUrl = "";
+		}
+		
 		try {
 			GridScheduler gridScheduler = new GridScheduler(isBackup, backupGridSchedulerUrl, noNodes, Arrays.copyOfRange(args, 3, args.length));
 		} catch (Exception e) {
