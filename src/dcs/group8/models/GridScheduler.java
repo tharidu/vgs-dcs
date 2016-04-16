@@ -143,6 +143,36 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		logger.debug(message);
 	}
 	
+	public void checkRmHeartBeatStatus()
+	{
+		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
+			if (entry.getValue().isHasCrashed()) {
+				continue;
+			}
+			
+			RetryStrategy retry = new RetryStrategy();
+			while (retry.shouldRetry()) {
+				try {
+					ResourceManagerRemoteMessaging gsm_stub = (ResourceManagerRemoteMessaging) RegistryUtil
+							.returnRegistry(entry.getValue().getClusterUrl(), "ResourceManagerRemoteMessaging");
+					int reply = gsm_stub.gsToRmStatusMessage();
+					retry.setSuccessfullyTried(true);
+				} catch (Exception e) {
+					try {
+						retry.errorOccured();
+					} catch (RetryException e1) {
+						logger.error("Heartbeat - Could not contact other rm@" + entry.getValue().getClusterUrl());
+						entry.getValue().setHasCrashed(true);
+						logger.info("Number of jobs that were running: "+entry.getValue().getBusyCount());
+						entry.getValue().setBusyCount(0);
+						rescheduleJobs(entry.getValue().getJobList());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * The polling thread monitors the queue of external jobs in order to try
@@ -159,7 +189,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		while (running) {
 			
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
+				checkRmHeartBeatStatus();
 				reportBusyCount();
 				if (!isBackup) {
 					Job job = externalJobs.poll();
