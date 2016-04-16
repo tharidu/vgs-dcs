@@ -7,15 +7,6 @@ public class RetryStrategy {
 	private int numberOfRetries; // total number of tries
 	private int numberOfTriesLeft; // number left
 	private long timeToWait; // wait interval
-	private boolean successfullyTried = false;
-	
-	public boolean isSuccessfullyTried() {
-		return successfullyTried;
-	}
-
-	public void setSuccessfullyTried(boolean successfullyTried) {
-		this.successfullyTried = successfullyTried;
-	}
 
 	public RetryStrategy() {
 		this(DEFAULT_NUMBER_OF_RETRIES, DEFAULT_WAIT_TIME);
@@ -31,8 +22,7 @@ public class RetryStrategy {
 	 * @return true if there are tries left
 	 */
 	public boolean shouldRetry() {
-		numberOfTriesLeft--;
-		return (numberOfTriesLeft > 0 && !successfullyTried);
+		return numberOfTriesLeft > 0;
 	}
 
 	/**
@@ -43,7 +33,7 @@ public class RetryStrategy {
 	 */
 	public void errorOccured() throws RetryException {
 		numberOfTriesLeft--;
-		if (!(numberOfRetries>0)) {
+		if (!shouldRetry()) {
 			throw new RetryException(
 					numberOfRetries + " attempts to retry failed at " + getTimeToWait() + "ms interval");
 		}

@@ -68,7 +68,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 				
 				logger.info("Job with Job_id:"+job.getJobNo()+" was completed");
 				
-				retry.setSuccessfullyTried(true);
+				break;
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -142,7 +142,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 														.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsStatusMessage(myCluster.getUrl(),busyCount);
-				retry.setSuccessfullyTried(true);
+				break;
 			}
 			catch (Exception e) {
 				logger.error("Unable to connect to replica gs@"+myGS);

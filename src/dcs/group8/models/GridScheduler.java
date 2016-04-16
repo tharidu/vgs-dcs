@@ -156,7 +156,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					ResourceManagerRemoteMessaging gsm_stub = (ResourceManagerRemoteMessaging) RegistryUtil
 							.returnRegistry(entry.getValue().getClusterUrl(), "ResourceManagerRemoteMessaging");
 					int reply = gsm_stub.gsToRmStatusMessage();
-					retry.setSuccessfullyTried(true);
+//					logger.info("Got " + reply + " from rm" + entry.getValue().getClusterUrl());
+					break;
 				} catch (Exception e) {
 					try {
 						retry.errorOccured();
@@ -211,7 +212,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 										lowestUtilzation = reply.utilization;
 										acceptedGsUrl = gsUrl;
 									}
-									retry.setSuccessfullyTried(true);
+									break;
 									
 								} catch (Exception e) {
 									try {
@@ -242,7 +243,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 									GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 																			.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 									gs_stub.backupExternalJobs(job, false);
-									retry.setSuccessfullyTried(true);
+									break;
 								} catch (Exception e) {
 									try {
 										retry.errorOccured();
@@ -262,7 +263,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 											.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
 									gsm_stub.gsToGsJobMessage(new JobMessage(job));
 									logger.info("Job successfully sent to gs@" + acceptedGsUrl);
-									retry.setSuccessfullyTried(true);
+									break;
 								} catch (Exception e) {
 									try {
 										retry.errorOccured();
@@ -310,7 +311,6 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 				ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) RegistryUtil.returnRegistry(clientid,
 						"ClientRemoteMessaging");
 				crm_stub.gsToClientMessage(message);
-				retry.setSuccessfullyTried(true);
 				break;
 			} catch (Exception e) {
 				try {
@@ -373,8 +373,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					jb.job.setClusterId(selectedCluster.getKey());
 					String ack = rm_stub.gsToRmJobMessage(jb);
 					logger.info("rm@" + selectedCluster.getValue().getClusterUrl() + " responded: " + ack);
-					retry.setSuccessfullyTried(true);
 					clusterStatus.get(selectedCluster.getKey()).increaseBusyCount();
+					break;
 				} catch (Exception e) {
 					try {
 						retry.errorOccured();
@@ -391,7 +391,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 						
 						/* call the method to start a thread that it will  reschedule the jobs of this rm*/
 						rescheduleJobs(selectedCluster.getValue().getJobList());
-						
+						selectedCluster.getValue().setBusyCount(0);
 						e.printStackTrace();
 					}
 				}
@@ -416,7 +416,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 								.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 						gs_stub.backupExternalJobs(jb.job, true);
-						retry.setSuccessfullyTried(true);
+						break;
 					} catch (Exception e) {
 						logger.error("Exception " + e.getMessage());
 						try {
@@ -442,6 +442,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 */
 	private void rescheduleJobs(ArrayList<Job> jlist){
 		RescheduleThread rt = new RescheduleThread(jlist, this);
+		
+		for (Job job : jlist) {
+			logger.info("Rescheduling job - " + job.getJobNo());
+		}
+		
 		Thread reThread = new Thread(rt);
 		reThread.start();
 	}
