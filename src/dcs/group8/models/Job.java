@@ -25,6 +25,9 @@ public class Job implements Serializable {
 	private UUID clientId;
 	private UUID clusterId;
 	
+	private int clientNo;
+	private int jobNo;
+	
 	
 	/**
 	 * 
@@ -35,7 +38,11 @@ public class Job implements Serializable {
 	 * @param clientUrl The url address of the client submitting the job
 	 * 
 	 */
-	public Job(UUID jobId, long jobDuration, UUID clientId, String clientUrl) {
+	public Job(UUID jobId, long jobDuration, UUID clientId, String clientUrl,int jobNo,int clientNo) {
+		
+		this.clientNo = clientNo;
+		this.jobNo = jobNo;
+		
 		this.clientUrl = clientUrl;
 		this.jobId = jobId;
 		this.jobDuration = jobDuration;
@@ -52,8 +59,8 @@ public class Job implements Serializable {
 	 */
 	@Override
 	public String toString(){
-		return " Job_id: "+this.jobId+" from client@"+this.clientUrl+" ";
-		
+		//return " Job_id: "+this.jobId+" from client@"+this.clientUrl+" ";
+		return "Job_no: "+this.jobNo+ " from client_"+this.clientNo;
 	}
 	
 	/***  GETTERS AND SETTERS METHODS  ***/
@@ -61,6 +68,26 @@ public class Job implements Serializable {
 	public String getClientUrl() {
 		return clientUrl;
 	}
+
+	public int getClientNo() {
+		return clientNo;
+	}
+
+
+	public void setClientNo(int clientNo) {
+		this.clientNo = clientNo;
+	}
+
+
+	public int getJobNo() {
+		return jobNo;
+	}
+
+
+	public void setJobNo(int jobNo) {
+		this.jobNo = jobNo;
+	}
+
 
 	public void setClientUrl(String clientUrl) {
 		this.clientUrl = clientUrl;

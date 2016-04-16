@@ -66,7 +66,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 													   .returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsMessage(new JobMessage(job));
 				
-				logger.info("Job with Job_id:"+job.getJobId()+" was completed");
+				logger.info("Job with Job_id:"+job.getJobNo()+" was completed");
 				
 				retry.setSuccessfullyTried(true);
 				
@@ -118,7 +118,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			th.start();
 			busyCount++;
 			
-			logger.info("Adding job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
+			logger.info("Adding job with Job_id: "+ jbm.job.getJobNo()+" to a node at cluster@"+jbm.job.getClientUrl());
 //		} else {
 //			logger.info("Lost job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
 //		}

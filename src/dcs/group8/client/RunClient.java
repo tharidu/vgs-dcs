@@ -53,7 +53,7 @@ public class RunClient implements ClientRemoteMessaging{
 	 * 
 	 */
 	public void gsToClientMessage(JobMessage jcm){
-		logger.info("My job with id: "+jcm.job.getJobId().toString()
+		logger.info("My job with id: "+jcm.job.getJobNo()
 				    +" was succesfully completed by cluster@: "+jcm.job.getClusterId().toString());
 	}
 
@@ -135,7 +135,9 @@ public class RunClient implements ClientRemoteMessaging{
 		
 		/*** Create a number of jobs here and add them to a list to submit them in the DCS ***/
 		ArrayList<Job> jlist = new ArrayList<Job>();
-		JobFactory jobFactory = new JobFactory(cl.myUUID,5000,10000,myIpAddress);
+		
+		/*** CHANGE CLIENT NUMBER (1) TO BE INSERTED AS ARGUMENT FOR THE CLIENT  ***/
+		JobFactory jobFactory = new JobFactory(cl.myUUID,20000,1000,myIpAddress,1);
 		for (int i=0;i<numberOfJobs;i++){
 			jlist.add(jobFactory.createJob());
 		}
@@ -148,7 +150,28 @@ public class RunClient implements ClientRemoteMessaging{
 			// Generate events at an average rate of 20 per minute.
 			ExponentialGenerator gen = new ExponentialGenerator(20, rng);
 			
-			for (Job job : jlist){
+			for (int i=0;i<jlist.size();i++){
+				Job job = jlist.get(i);
+				if (i==20 || i==40 || i==60){
+					Thread.sleep(15000);
+				}
+			    
+				gsaddr = cl.getRoundRobinGs(gsarr);
+				Registry registry = LocateRegistry.getRegistry(gsaddr);
+				GridSchedulerRemoteMessaging clgs_stub = (GridSchedulerRemoteMessaging) registry.lookup("GridSchedulerRemoteMessaging");
+				
+				logger.info("[+] Submitting "+job.toString()+" to gs@"+gsaddr);
+				
+				String ack = clgs_stub.clientToGsMessage(JobFactory.createMessage(job));
+				
+				logger.info("[+]Response from gs@"+gsaddr+":"+ack);
+			}
+		}
+			
+			
+			
+			
+			/*for (Job job : jlist){
 //				Thread.sleep(1000);
 				
 				long interval = Math.round(gen.nextValue() * timePeriod);
@@ -164,7 +187,7 @@ public class RunClient implements ClientRemoteMessaging{
 				
 				logger.info("[+]Response from gs@"+gsaddr+":"+ack);
 			}
-		}
+		}*/
 		catch (Exception e ){
 			logger.error("Rmi exception occured could not submit jobs to gs@"+gsaddr);
 			e.printStackTrace();
