@@ -106,7 +106,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	public String gsToRmJobMessage(final JobMessage jbm) throws RemoteException {
 		
 		/* DO WE NEED TO CHECK FOR THE BUSYCOUNT HERE */
-		if (busyCount < rmNodes) {
+//		if (busyCount < rmNodes) {
 			Thread th = new Thread(new Node(jbm.job, new CallBack() {
 
 				@Override
@@ -119,9 +119,9 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 			busyCount++;
 			
 			logger.info("Adding job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
-		} else {
-			logger.info("Lost job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
-		}
+//		} else {
+//			logger.info("Lost job with Job_id: "+ jbm.job.getJobId()+" to a node at cluster@"+jbm.job.getClientUrl());
+//		}
 		return "Job accepted by the resource manager and assigned to a node";
 	}
 	
@@ -142,6 +142,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 														.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsStatusMessage(myCluster.getUrl(),busyCount);
+				retry.setSuccessfullyTried(true);
 			}
 			catch (Exception e) {
 				logger.error("Unable to connect to replica gs@"+myGS);

@@ -31,7 +31,7 @@ public class RetryStrategy {
 	 * @return true if there are tries left
 	 */
 	public boolean shouldRetry() {
-		numberOfRetries--;
+		numberOfTriesLeft--;
 		return (numberOfTriesLeft > 0 && !successfullyTried);
 	}
 

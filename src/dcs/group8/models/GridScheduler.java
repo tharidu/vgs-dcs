@@ -207,9 +207,11 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 							while (retry.shouldRetry()) {
 								try {
+									logger.info("Removing Backup of job " + job.getJobId() + " from " + this.getBackupHost());
 									GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 																			.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 									gs_stub.backupExternalJobs(job, false);
+									retry.setSuccessfullyTried(true);
 								} catch (Exception e) {
 									try {
 										retry.errorOccured();
@@ -260,6 +262,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		/* First communication of a RM with the replica GS, turn flag to false */
 		if (isBackup) {
 			isBackup = false;
+			logger.info("Backup GS becoming active");
 		}
 
 		UUID cid = message.job.getClusterId();
@@ -302,6 +305,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		/* First communication of a client with the replica GS, turn flag to false */
 		if (isBackup) {
 			isBackup = false;
+			logger.info("Backup GS becoming active");
 		}
 
 		ConcurrentHashMap.Entry<UUID, GsClusterStatus> selectedCluster = null;
@@ -377,10 +381,13 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 				while (retry.shouldRetry()) {
 					try {
+						logger.info("Backing up job " + jb.job.getJobId() + " to " + this.getBackupHost());
 						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 								.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 						gs_stub.backupExternalJobs(jb.job, true);
+						retry.setSuccessfullyTried(true);
 					} catch (Exception e) {
+						logger.error("Exception " + e.getMessage());
 						try {
 							retry.errorOccured();
 						} catch (RetryException e1) {
@@ -519,9 +526,10 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	public void backupExternalJobs(Job job, boolean add) throws RemoteException {
 		if (add) {
 			externalJobs.add(job);
-			logger.info("Backup external job received");
+			logger.info("Backup external job received " + job.getJobId());
 		} else {
 			externalJobs.remove(job);
+			logger.info("Backup external job removed " + job.getJobId());
 		}
 
 	}
