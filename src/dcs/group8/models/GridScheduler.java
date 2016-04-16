@@ -381,18 +381,10 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 					} catch (RetryException e1) {
 						logger.error("Communication with rm@" + selectedCluster.getValue().getClusterUrl()
 								+ " could not be established after 5 retries...the resource manager is offline");
-						logger.info("Trying to reschedule all the jobs for this resource manager");
-						// TODO an rm has crashed recover all the jobs that is
-						// currently running and set the correct cluster status
-						selectedCluster.getValue().setHasCrashed(true);
 						
 						/* SHOULD WE NOT RETRY HERE FINDING A CLUSTER THAT IS AVAILABLE TO TAKE THE JOB???*/
 						clientToGsMessage(jb);
 						
-						/* call the method to start a thread that it will  reschedule the jobs of this rm*/
-						rescheduleJobs(selectedCluster.getValue().getJobList());
-						selectedCluster.getValue().setBusyCount(0);
-						e.printStackTrace();
 					}
 				}
 			}
