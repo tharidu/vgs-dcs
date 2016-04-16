@@ -207,7 +207,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 							while (retry.shouldRetry()) {
 								try {
-									logger.info("Removing Backup of job " + job.getJobId() + " from " + this.getBackupHost());
+									logger.info("Removing Backup of job " + job.getJobNo() + " from " + this.getBackupHost());
 									GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 																			.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 									gs_stub.backupExternalJobs(job, false);
@@ -268,7 +268,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		UUID cid = message.job.getClusterId();
 		String clientid = message.job.getClientUrl();
 		clusterStatus.get(cid).decreaseBusyCount();
-		logger.info("Job with Job_id: " + message.job.getJobId() + " was completed from cluster@"
+		logger.info("Job with Job_id: " + message.job.getJobNo() + " was completed from cluster@"
 																+ clusterStatus.get(cid).getClusterUrl());
 
 		clusterStatus.get(cid).removeJob(message.job);
@@ -285,7 +285,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 				try {
 					retry.errorOccured();
 				} catch (RetryException e1) {
-					logger.error("Message for job completion with Job_Id:"+message.job.getJobId()+" could not be send from gs to client@"
+					logger.error("Message for job completion with Job_Id:"+message.job.getJobNo()+" could not be send from gs to client@"
 							+ message.job.getClientUrl());
 					e.printStackTrace();
 				}
@@ -329,7 +329,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		/* Found suitable cluster to assign the job to */
 		if (selectedCluster != null) {
 		
-			logger.info("Assigning Job with Job_id:" + jb.job.getJobId() + " to cluster@"
+			logger.info("Assigning Job with Job_id:" + jb.job.getJobNo() + " to cluster@"
 					+ selectedCluster.getValue().getClusterUrl());
 			
 			RetryStrategy retry = new RetryStrategy();
@@ -371,7 +371,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			// Send it to external queue, either everything is crashed!!
 			// or we could all the clusters in the VO are at their peak
 			// of their utilization
-			logger.info("Job with job_id: " + jb.job.getJobId() + " for client@" + jb.job.getClientUrl()
+			logger.info("Job with job_id: " + jb.job.getJobNo() + " for client@" + jb.job.getClientUrl()
 					+ " is placed in the external jobs queue");
 			externalJobs.add(jb.job);
 
@@ -381,7 +381,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 				while (retry.shouldRetry()) {
 					try {
-						logger.info("Backing up job " + jb.job.getJobId() + " to " + this.getBackupHost());
+						logger.info("Backing up job " + jb.job.getJobNo() + " to " + this.getBackupHost());
 						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 								.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 						gs_stub.backupExternalJobs(jb.job, true);
@@ -460,7 +460,7 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 * Offloads the job to another GS
 	 */
 	public void gsToGsJobMessage(JobMessage message) throws RemoteException {
-		logger.info("Job with Job_id: " + message.job.getJobId() + " was received from another GS");
+		logger.info("Job with Job_id: " + message.job.getJobNo() + " was received from another GS");
 		clientToGsMessage(message);
 	}
 
@@ -526,10 +526,10 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	public void backupExternalJobs(Job job, boolean add) throws RemoteException {
 		if (add) {
 			externalJobs.add(job);
-			logger.info("Backup external job received " + job.getJobId());
+			logger.info("Backup external job received " + job.getJobNo());
 		} else {
 			externalJobs.remove(job);
-			logger.info("Backup external job removed " + job.getJobId());
+			logger.info("Backup external job removed " + job.getJobNo());
 		}
 
 	}

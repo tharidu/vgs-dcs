@@ -20,6 +20,10 @@ public class JobFactory {
 	private int randomRange;
 	private String client_url;
 	
+	private int clientNo;
+	private static int jobCount=0;
+	
+	
 	
 	/**
 	 * 
@@ -30,7 +34,10 @@ public class JobFactory {
 	 * @param cUrl The string url of this client
 	 * 
 	 */
-	public JobFactory(UUID cid, int ld, int rr, String cUrl){
+	public JobFactory(UUID cid, int ld, int rr, String cUrl,int clientNo){
+		
+		this.clientNo = clientNo;
+		
 		this.client_id = cid;
 		this.lowestDuration = ld;
 		this.randomRange = rr;
@@ -47,7 +54,8 @@ public class JobFactory {
 		UUID jid = UUID.randomUUID();
 		Random rand = new Random();
 		int duration = rand.nextInt(this.randomRange)+this.lowestDuration;
-		return new Job(jid, duration, client_id, this.client_url);
+		jobCount++;
+		return new Job(jid, duration, client_id, this.client_url,jobCount,this.clientNo);
 	}
 	
 	/**
