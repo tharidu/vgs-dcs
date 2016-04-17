@@ -137,7 +137,7 @@ public class RunClient implements ClientRemoteMessaging{
 		ArrayList<Job> jlist = new ArrayList<Job>();
 		
 		/*** CHANGE CLIENT NUMBER (1) TO BE INSERTED AS ARGUMENT FOR THE CLIENT  ***/
-		JobFactory jobFactory = new JobFactory(cl.myUUID,20000,1000,myIpAddress,1);
+		JobFactory jobFactory = new JobFactory(cl.myUUID,22000,1000,myIpAddress,1);
 		for (int i=0;i<numberOfJobs;i++){
 			jlist.add(jobFactory.createJob());
 		}
@@ -152,8 +152,8 @@ public class RunClient implements ClientRemoteMessaging{
 			
 			for (int i=0;i<jlist.size();i++){
 				Job job = jlist.get(i);
-				if (i==20 || i==40 || i==60){
-					Thread.sleep(15000);
+				if (i%40==0){
+					Thread.sleep(20000);
 				}
 			    
 				gsaddr = cl.getRoundRobinGs(gsarr);
