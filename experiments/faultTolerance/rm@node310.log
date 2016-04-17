@@ -1,0 +1,12 @@
+16:36:33.249 INFO  dcs.group8.models.ResourceManager 48 <init> - The resource manager rm@node310 was created
+16:36:33.249 INFO  dcs.group8.models.ResourceManager 48 <init> - The resource manager rm@node310 was created
+16:37:00.742 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 3 to a node at cluster@10.141.3.31
+16:37:00.781 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 7 to a node at cluster@10.141.3.31
+16:37:00.814 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 11 to a node at cluster@10.141.3.31
+16:37:00.847 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 15 to a node at cluster@10.141.3.31
+16:37:00.880 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 19 to a node at cluster@10.141.3.31
+16:37:00.913 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 23 to a node at cluster@10.141.3.31
+16:37:00.946 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 27 to a node at cluster@10.141.3.31
+16:37:00.979 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 31 to a node at cluster@10.141.3.31
+16:37:01.011 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 35 to a node at cluster@10.141.3.31
+16:37:01.042 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 39 to a node at cluster@10.141.3.31

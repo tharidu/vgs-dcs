@@ -516,12 +516,15 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		// to online
 		UUID key = null;
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
+			logger.debug("The current cluster url is :"+entry.getValue().getClusterUrl()+ "and looking for :"+clusterURL);
 			if (entry.getValue().getClusterUrl().equals(clusterURL)) {
+				logger.debug("Cluster with hostname: "+clusterURL +"was found!");
 				key = entry.getKey();
 				break;
 			}
 		}
 		if (key != null) {
+			logger.debug("Setting the hasCrashed flag to false for cluster: "+clusterURL);
 			clusterStatus.get(key).setHasCrashed(false);
 		}
 

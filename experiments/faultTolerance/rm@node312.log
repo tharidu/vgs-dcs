@@ -1,0 +1,83 @@
+16:36:33.552 INFO  dcs.group8.models.ResourceManager 48 <init> - The resource manager rm@node312 was created
+16:36:33.553 INFO  dcs.group8.models.ResourceManager 48 <init> - The resource manager rm@node312 was created
+16:37:00.756 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 4 to a node at cluster@10.141.3.31
+16:37:00.789 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 8 to a node at cluster@10.141.3.31
+16:37:00.822 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 12 to a node at cluster@10.141.3.31
+16:37:00.856 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 16 to a node at cluster@10.141.3.31
+16:37:00.888 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 20 to a node at cluster@10.141.3.31
+16:37:00.921 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 24 to a node at cluster@10.141.3.31
+16:37:00.954 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 28 to a node at cluster@10.141.3.31
+16:37:00.987 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 32 to a node at cluster@10.141.3.31
+16:37:01.019 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 36 to a node at cluster@10.141.3.31
+16:37:01.050 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 40 to a node at cluster@10.141.3.31
+16:37:22.825 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:4 was completed
+16:37:22.825 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:22.900 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:12 was completed
+16:37:22.900 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.151 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:32 was completed
+16:37:23.151 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.333 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:20 was completed
+16:37:23.333 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.412 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:16 was completed
+16:37:23.412 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.474 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:24 was completed
+16:37:23.474 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.526 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:36 was completed
+16:37:23.526 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.579 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:40 was completed
+16:37:23.579 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.630 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:28 was completed
+16:37:23.631 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:23.721 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:8 was completed
+16:37:23.722 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:26.581 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 19 to a node at cluster@10.141.3.31
+16:37:30.618 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 23 to a node at cluster@10.141.3.31
+16:37:34.655 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 41 to a node at cluster@10.141.3.31
+16:37:38.696 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 45 to a node at cluster@10.141.3.31
+16:37:41.373 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 82 to a node at cluster@10.141.3.31
+16:37:41.404 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 86 to a node at cluster@10.141.3.31
+16:37:41.433 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 90 to a node at cluster@10.141.3.31
+16:37:41.462 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 94 to a node at cluster@10.141.3.31
+16:37:41.491 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 98 to a node at cluster@10.141.3.31
+16:37:41.520 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 102 to a node at cluster@10.141.3.31
+16:37:49.292 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:19 was completed
+16:37:49.292 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:50.765 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 57 to a node at cluster@10.141.3.31
+16:37:52.954 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:23 was completed
+16:37:52.955 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:54.799 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 61 to a node at cluster@10.141.3.31
+16:37:57.543 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:41 was completed
+16:37:57.543 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:37:58.833 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 65 to a node at cluster@10.141.3.31
+16:38:01.227 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:45 was completed
+16:38:01.228 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:01.835 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 122 to a node at cluster@10.141.3.31
+16:38:03.646 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:86 was completed
+16:38:03.646 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:03.705 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:82 was completed
+16:38:03.706 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:03.831 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:90 was completed
+16:38:03.831 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:03.838 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:94 was completed
+16:38:03.838 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:03.916 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:98 was completed
+16:38:03.916 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:04.366 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:102 was completed
+16:38:04.366 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:07.046 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 73 to a node at cluster@10.141.3.31
+16:38:13.096 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 79 to a node at cluster@10.141.3.31
+16:38:13.419 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:57 was completed
+16:38:13.419 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:17.129 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 15 to a node at cluster@10.141.3.31
+16:38:17.502 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:61 was completed
+16:38:17.502 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:19.145 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 42 to a node at cluster@10.141.3.31
+16:38:21.693 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:65 was completed
+16:38:21.693 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:24.257 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:122 was completed
+16:38:24.257 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:25.194 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 81 to a node at cluster@10.141.3.31
+16:38:29.226 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 85 to a node at cluster@10.141.3.31
+16:38:29.998 INFO  dcs.group8.models.ResourceManager 69 callBackHandler - Job with Job_id:73 was completed
+16:38:29.998 INFO  dcs.group8.models.ResourceManager 95 callBackHandler - One more node is available now
+16:38:31.242 INFO  dcs.group8.models.ResourceManager 121 gsToRmJobMessage - Adding job with Job_id: 87 to a node at cluster@10.141.3.31

@@ -1,0 +1,249 @@
+16:36:38.322 INFO  dcs.group8.models.GridScheduler 80 <init> - Initializing a replica gs@node308
+16:36:38.324 INFO  dcs.group8.models.GridScheduler 103 gridSchedulerInit - Reading properties files for clusters and grid schedulers
+16:36:38.326 INFO  dcs.group8.models.GridScheduler 118 gridSchedulerInit - Initializing the status of the clusters
+16:36:38.505 INFO  dcs.group8.models.GridScheduler 459 setUpRegistry - Grid scheduler's registry was properly set up
+16:36:38.506 INFO  dcs.group8.models.GridScheduler 188 run - Starting gs@node308
+16:36:40.531 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:42.537 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:44.543 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:46.549 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:48.555 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:50.560 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:52.566 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:54.573 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:56.579 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:36:58.585 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:00.590 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:02.596 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:04.602 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:06.608 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:08.614 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:10.619 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:12.625 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:14.630 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:16.635 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:18.821 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:20.827 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:21.076 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 42
+16:37:21.091 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 44
+16:37:21.106 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 46
+16:37:21.120 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 48
+16:37:21.135 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 50
+16:37:21.150 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 52
+16:37:21.164 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 54
+16:37:21.179 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 56
+16:37:21.194 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 58
+16:37:21.210 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 60
+16:37:21.224 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 62
+16:37:21.239 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 64
+16:37:21.254 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 66
+16:37:21.268 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 68
+16:37:21.283 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 70
+16:37:21.299 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 72
+16:37:21.313 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 74
+16:37:21.328 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 76
+16:37:21.342 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 78
+16:37:21.357 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 80
+16:37:22.543 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 42
+16:37:22.832 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:24.563 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 44
+16:37:24.838 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:26.582 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 46
+16:37:26.843 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:28.601 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 48
+16:37:28.849 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:30.621 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 50
+16:37:30.854 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:32.641 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 52
+16:37:32.860 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:34.660 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 54
+16:37:34.865 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:36.686 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 56
+16:37:36.870 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:38.705 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 58
+16:37:38.876 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:40.724 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 60
+16:37:40.882 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:41.534 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 104
+16:37:41.548 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 106
+16:37:41.563 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 108
+16:37:41.577 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 110
+16:37:41.590 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 112
+16:37:41.604 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 114
+16:37:41.618 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 116
+16:37:41.632 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 118
+16:37:41.646 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 120
+16:37:42.742 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 62
+16:37:42.887 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:44.767 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 64
+16:37:44.892 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:46.785 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 66
+16:37:46.897 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:48.805 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 68
+16:37:48.903 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:50.824 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 70
+16:37:50.908 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:52.843 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 72
+16:37:52.914 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:54.863 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 74
+16:37:54.920 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:56.921 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 76
+16:37:56.925 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:58.931 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:37:58.979 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 78
+16:38:00.937 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:00.997 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 80
+16:38:01.850 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 124
+16:38:01.864 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 126
+16:38:01.878 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 128
+16:38:01.892 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 130
+16:38:01.905 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 132
+16:38:01.919 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 134
+16:38:01.932 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 136
+16:38:01.945 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 138
+16:38:01.958 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 140
+16:38:01.972 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 142
+16:38:01.985 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 144
+16:38:01.999 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 146
+16:38:02.012 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 148
+16:38:02.026 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 150
+16:38:02.040 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 152
+16:38:02.053 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 154
+16:38:02.067 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 156
+16:38:02.081 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 158
+16:38:02.094 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 160
+16:38:02.943 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:03.017 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 104
+16:38:04.948 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:05.036 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 106
+16:38:06.954 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:07.053 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 108
+16:38:08.959 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:09.071 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 110
+16:38:10.964 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:11.089 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 112
+16:38:12.970 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:13.107 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 114
+16:38:14.975 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:15.124 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 116
+16:38:16.981 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:17.143 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 118
+16:38:18.987 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:19.161 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 120
+16:38:20.992 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:21.179 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 124
+16:38:22.998 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:23.197 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 126
+16:38:25.204 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:25.215 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 128
+16:38:27.210 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:27.233 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 130
+16:38:29.216 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:29.251 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 132
+16:38:31.221 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:31.269 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 134
+16:38:33.227 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:33.286 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 136
+16:38:35.232 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:39.637 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 138
+16:38:41.448 ERROR dcs.group8.models.GridScheduler 165 checkRmHeartBeatStatus - Heartbeat - Could not contact other rm@node312
+16:38:41.448 INFO  dcs.group8.models.GridScheduler 167 checkRmHeartBeatStatus - Number of jobs that were running: 0
+16:38:41.452 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:41.653 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 140
+16:38:43.341 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 99
+16:38:43.455 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:43.642 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 42
+16:38:43.669 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 142
+16:38:45.458 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:45.685 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 144
+16:38:47.372 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 103
+16:38:47.461 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:47.651 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 85
+16:38:47.702 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 146
+16:38:49.388 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 105
+16:38:49.464 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:49.655 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 87
+16:38:49.718 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 148
+16:38:51.467 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:51.734 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 150
+16:38:53.420 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 109
+16:38:53.470 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:53.750 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 152
+16:38:55.436 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 111
+16:38:55.473 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:55.968 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 154
+16:38:57.476 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:38:57.983 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 156
+16:38:59.479 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:00.125 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 158
+16:39:01.482 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:02.140 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 160
+16:39:03.485 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:04.155 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 99
+16:39:05.488 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:06.171 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 42
+16:39:07.490 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:08.343 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 103
+16:39:09.493 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:10.360 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 85
+16:39:11.496 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:12.376 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 105
+16:39:13.499 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:14.391 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 87
+16:39:15.502 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:16.407 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 109
+16:39:17.505 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:17.649 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 127
+16:39:18.423 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 111
+16:39:19.508 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:20.439 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 127
+16:39:21.511 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:21.680 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 131
+16:39:22.456 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 131
+16:39:23.514 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:25.517 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:27.520 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:29.523 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:31.526 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:33.529 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:35.532 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:37.535 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:39.739 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:41.742 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:41.906 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 151
+16:39:42.499 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 151
+16:39:43.745 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:45.748 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:45.937 INFO  dcs.group8.models.GridScheduler 557 backupExternalJobs - Backup external job received 155
+16:39:46.723 INFO  dcs.group8.models.GridScheduler 560 backupExternalJobs - Backup external job removed 155
+16:39:47.751 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:49.754 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:51.757 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:53.760 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:55.763 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:57.766 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:39:59.769 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:01.772 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:03.774 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:05.777 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:07.780 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:09.783 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:11.786 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:13.789 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:15.792 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:17.795 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:19.798 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:21.801 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:23.804 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:25.807 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:27.810 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:29.813 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:31.816 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:33.819 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:35.821 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:37.824 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:39.827 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:41.830 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:43.833 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:45.836 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
+16:40:47.839 DEBUG dcs.group8.models.GridScheduler 143 reportBusyCount - VO load status,node313,0,node312,0
