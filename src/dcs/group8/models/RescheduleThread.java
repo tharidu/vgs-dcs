@@ -8,6 +8,7 @@ public class RescheduleThread implements Runnable {
 	private GridScheduler gsref;
 	
 	public RescheduleThread(ArrayList<Job> jlist,GridScheduler gsref){
+		this.jlist = new ArrayList<Job>();
 		Job temp[] = new Job[jlist.size()];
 		temp = jlist.toArray(temp);
 		for (Job job : temp){
