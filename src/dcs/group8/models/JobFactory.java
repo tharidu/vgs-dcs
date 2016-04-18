@@ -59,6 +59,18 @@ public class JobFactory {
 	}
 	
 	/**
+	 * 
+	 * Creates a Job for a client with a given job duration
+	 * @return Job a job with the preferences set from the client to this JobFactory
+	 * 
+	 */
+	public Job createJob(int duration){
+		UUID jid = UUID.randomUUID();
+		jobCount++;
+		return new Job(jid, duration, client_id, this.client_url,jobCount,this.clientNo);
+	}
+	
+	/**
 	 * Just wraps a Job in a JobMessage and returns it
 	 * @param job The Job object to be included in the message
 	 * @return JobMessage The message containing the job
