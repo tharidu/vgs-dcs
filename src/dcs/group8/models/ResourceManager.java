@@ -1,5 +1,6 @@
 package dcs.group8.models;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.SortedMap;
@@ -14,7 +15,6 @@ import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 import dcs.group8.utils.RegistryUtil;
 import dcs.group8.utils.RetryException;
 import dcs.group8.utils.RetryStrategy;
-import dcs.group8.utils.TimerUtil;
 
 public class ResourceManager implements ResourceManagerRemoteMessaging {
 	
@@ -29,8 +29,7 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	public SortedMap<Long, Integer> jobEndTimes;
 	public static int busyCount;
 	
-	private static TimerUtil messageTime;
-	
+
 	/**
 	 * 
 	 * Constructor method for the Resource Manager of a cluster in a VO
@@ -42,8 +41,6 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		this.rmNodes = nodeCount;
 		this.nodes = new Node[nodeCount];
 		this.jobEndTimes = new TreeMap<Long, Integer>();
-		
-		messageTime = new TimerUtil();
 		
 		myCluster = cl;
 		myGS = myCluster.getGridSchedulerUrl();
@@ -65,17 +62,11 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 
 		while (retry.shouldRetry()) {
 			try {
-				
-				messageTime.startTimer();
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 													   .returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsMessage(new JobMessage(job));
-				messageTime.stopTimer();
 				
 				logger.info("Job with Job_id:"+job.getJobNo()+" was completed");
-				
-				//report messaging time here
-				logger.debug("Message time overhead,"+messageTime.getTotalTime());
 				
 				break;
 				
@@ -148,16 +139,9 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		
 		while(retry.shouldRetry()){
 			try {
-				
-				messageTime.startTimer();
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 														.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsStatusMessage(myCluster.getUrl(),busyCount);
-				messageTime.stopTimer();
-				
-				//report message time here
-				logger.debug("Message time overhead,"+messageTime.getTotalTime());
-				
 				break;
 			}
 			catch (Exception e) {
