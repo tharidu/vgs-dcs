@@ -15,6 +15,7 @@ import dcs.group8.messaging.ResourceManagerRemoteMessaging;
 import dcs.group8.utils.RegistryUtil;
 import dcs.group8.utils.RetryException;
 import dcs.group8.utils.RetryStrategy;
+import dcs.group8.utils.TimerUtil;
 
 /**
  * 
@@ -37,7 +38,9 @@ public class Cluster implements Remote {
 	private String gridSchedulerHost;
 	private String auxGridSchedulerHost;
 	private Thread pollingThread;
-
+	
+	
+	public static TimerUtil messageTime;
 	/**
 	 * 
 	 * @param url This cluster's url
@@ -48,6 +51,9 @@ public class Cluster implements Remote {
 	public Cluster(String url, String gridSchedulerUrl,String auxGridScheduler,int nodeCount) {
 		super();
 		this.host = url;
+		
+		messageTime = new TimerUtil();
+		
 		System.setProperty("logfilecluster", "cluster@"+this.host);
 		System.setProperty("logfilerm", "rm@"+this.host);
 		logger = LogManager.getLogger(Cluster.class);
@@ -79,9 +85,13 @@ public class Cluster implements Remote {
 		RetryStrategy retry = new RetryStrategy(100,1000);
 		while(retry.shouldRetry()){
 			try{
+				
+				messageTime.startTimer();
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 									.returnRegistry(gridSchedulerHost, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsStatusMessage(myURL);
+				messageTime.stopTimer();
+				
 				break;
 			}
 			catch(Exception e){
