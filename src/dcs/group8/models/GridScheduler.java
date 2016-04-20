@@ -51,8 +51,17 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	private boolean running;
 	
 	public boolean isBackup;
+	
+	private long startTime = 0;
+	// Thread safe variables holding the total time spent for messaging and consistency
+	private static long messageTime = 0;
+	private static long replicationTime = 0;
+	private static long totalTime = 0;
+	private static final Object lock = new Object();    //general lock
+	//private static final Object messageLock = new Object();  //lock only for access to the messageTime resource
+	//private static final Object replicaLock = new Object();  //lock only for access to the replicationTime resource
 
-
+	
 	/**
 	 * 
 	 * The GridScheduler constructor method for the instatiation of either a primary
@@ -68,6 +77,9 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		this.nodesPerCluster = noNodes;
 		this.myClusters = new ArrayList<String>(Arrays.asList(clusters));
 
+		//initialize once the start time of this instance of a GridScheduler
+		startTime = System.currentTimeMillis();
+		
 		try {
 			this.host = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
@@ -94,6 +106,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 		pollingThread.start();
 	}
 
+	
+	
 	/**
 	 * Initialization of a gridscheduler to save the addresses of the clusters
 	 * under his responsibility as well as the addresses of the rest of the
@@ -134,13 +148,23 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 	 * reportBusyCount is only used for the load balancing experiments
 	 * of our distributed system
 	 * 
+	 * also report here the timers' values for the experiment
+	 * 
 	 */
 	private void reportBusyCount(){
 		String message = "VO load status";
 		for (ConcurrentHashMap.Entry<UUID, GsClusterStatus> entry : clusterStatus.entrySet()) {
 			message+= ","+entry.getValue().getClusterUrl()+","+entry.getValue().getBusyCount().toString();
 		}
-		logger.debug(message);
+		
+		// calculate every time the total time this grid scheduler is operating
+		long timeSoFar = System.currentTimeMillis();
+		totalTime = timeSoFar - startTime;  //this does not need to be thread safe
+		
+		synchronized (lock) {
+			logger.debug(message+",totalTime,"+totalTime+",messageTime,"+messageTime+",replicationTime,"+replicationTime);
+		}
+		
 	}
 	
 	public void checkRmHeartBeatStatus()
@@ -153,9 +177,19 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			RetryStrategy retry = new RetryStrategy();
 			while (retry.shouldRetry()) {
 				try {
+					
+					long sTime = System.currentTimeMillis();
+					
 					ResourceManagerRemoteMessaging gsm_stub = (ResourceManagerRemoteMessaging) RegistryUtil
 							.returnRegistry(entry.getValue().getClusterUrl(), "ResourceManagerRemoteMessaging");
 					int reply = gsm_stub.gsToRmStatusMessage();
+					
+					long eTime = System.currentTimeMillis();
+					
+					synchronized (lock) {
+						messageTime += eTime -sTime;
+					}
+					
 //					logger.info("Got " + reply + " from rm" + entry.getValue().getClusterUrl());
 					break;
 				} catch (Exception e) {
@@ -173,6 +207,8 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			}
 		}
 	}
+	
+	
 	
 	/**
 	 * 
@@ -205,9 +241,19 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 							RetryStrategy retry = new RetryStrategy();
 							while (retry.shouldRetry()) {
 								try {
+									
+									long sTime = System.currentTimeMillis();
+									
 									GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 											.returnRegistry(gsUrl, "GridSchedulerRemoteMessaging");
 									StatusMessage reply = gsm_stub.gsToGsStatusMessage();
+									
+									long eTime = System.currentTimeMillis();
+									
+									synchronized (lock) {
+										messageTime += eTime - sTime;
+									}
+									
 									if (reply.utilization < lowestUtilzation) {
 										lowestUtilzation = reply.utilization;
 										acceptedGsUrl = gsUrl;
@@ -233,16 +279,27 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 						if (acceptedGsUrl.equals("")) {
 							externalJobs.add(job);
 							logger.info("No other GS is willing to take the job");
-						} else if (!this.getBackupHost().equals("")) {
+						} 
+						else if (!this.getBackupHost().equals("")) {
 							// Update aux GS about job removal from externalJobs
 							RetryStrategy retry = new RetryStrategy();
 
 							while (retry.shouldRetry()) {
 								try {
+									
+									long sTime = System.currentTimeMillis();
+									
 									logger.info("Removing Backup of job " + job.getJobNo() + " from " + this.getBackupHost());
 									GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 																			.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 									gs_stub.backupExternalJobs(job, false);
+									
+									long eTime = System.currentTimeMillis();
+									
+									synchronized (lock) {
+										replicationTime += eTime-sTime;
+									}
+									
 									break;
 								} catch (Exception e) {
 									try {
@@ -259,9 +316,19 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 							while (retry.shouldRetry()) {
 								try {
+									
+									long sTime = System.currentTimeMillis();
+									
 									GridSchedulerRemoteMessaging gsm_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 											.returnRegistry(acceptedGsUrl, "GridSchedulerRemoteMessaging");
 									gsm_stub.gsToGsJobMessage(new JobMessage(job));
+									
+									long eTime = System.currentTimeMillis();
+									
+									synchronized (lock) {
+										messageTime += eTime - sTime;
+									}
+									
 									logger.info("Job successfully sent to gs@" + acceptedGsUrl);
 									break;
 								} catch (Exception e) {
@@ -308,9 +375,20 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 
 		while (retry.shouldRetry()) {
 			try {
+				
+				long sTime = System.currentTimeMillis();
+				
 				ClientRemoteMessaging crm_stub = (ClientRemoteMessaging) RegistryUtil.returnRegistry(clientid,
 						"ClientRemoteMessaging");
 				crm_stub.gsToClientMessage(message);
+				
+				long eTime = System.currentTimeMillis();
+				
+				
+				synchronized (lock) {
+					messageTime += eTime-sTime;
+				}
+				
 				break;
 			} catch (Exception e) {
 				try {
@@ -366,12 +444,22 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 			RetryStrategy retry = new RetryStrategy();
 			while (retry.shouldRetry()) {
 				try {
+					
+					long sTime = System.currentTimeMillis();
+					
 					ResourceManagerRemoteMessaging rm_stub = (ResourceManagerRemoteMessaging) RegistryUtil
 							.returnRegistry(selectedCluster.getValue().getClusterUrl(),
 									"ResourceManagerRemoteMessaging");
 					
 					jb.job.setClusterId(selectedCluster.getKey());
 					String ack = rm_stub.gsToRmJobMessage(jb);
+					
+					long eTime = System.currentTimeMillis();
+					
+					synchronized (lock) {
+						messageTime += eTime -sTime;
+					}
+					
 					logger.info("rm@" + selectedCluster.getValue().getClusterUrl() + " responded: " + ack);
 					clusterStatus.get(selectedCluster.getKey()).increaseBusyCount();
 					break;
@@ -405,9 +493,19 @@ public class GridScheduler implements GridSchedulerRemoteMessaging, Runnable {
 				while (retry.shouldRetry()) {
 					try {
 						logger.info("Backing up job " + jb.job.getJobNo() + " to " + this.getBackupHost());
+						
+						long sTime = System.currentTimeMillis();
+						
 						GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 								.returnRegistry(this.getBackupHost(), "GridSchedulerRemoteMessaging");
 						gs_stub.backupExternalJobs(jb.job, true);
+						
+						long eTime = System.currentTimeMillis();
+						
+						synchronized (lock) {
+							replicationTime += eTime-sTime;
+						}
+						
 						break;
 					} catch (Exception e) {
 						logger.error("Exception " + e.getMessage());

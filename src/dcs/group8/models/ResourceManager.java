@@ -29,6 +29,8 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 	public SortedMap<Long, Integer> jobEndTimes;
 	public static int busyCount;
 	
+	private static long messageTime = 0;
+	private static final Object lock = new Object();
 
 	/**
 	 * 
@@ -62,12 +64,21 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 
 		while (retry.shouldRetry()) {
 			try {
+				
+				long sTime = System.currentTimeMillis();
+				
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 													   .returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsMessage(new JobMessage(job));
 				
-				logger.info("Job with Job_id:"+job.getJobNo()+" was completed");
+				long eTime = System.currentTimeMillis();
 				
+				synchronized (lock) {
+					messageTime += eTime - sTime;
+					logger.debug("Message_time,"+messageTime);
+				}
+				
+				logger.info("Job with Job_id:"+job.getJobNo()+" was completed");
 				break;
 				
 			} catch (Exception e) {
@@ -139,9 +150,20 @@ public class ResourceManager implements ResourceManagerRemoteMessaging {
 		
 		while(retry.shouldRetry()){
 			try {
+				
+				long sTime = System.currentTimeMillis();
+				
 				GridSchedulerRemoteMessaging gs_stub = (GridSchedulerRemoteMessaging) RegistryUtil
 														.returnRegistry(myGS, "GridSchedulerRemoteMessaging");
 				gs_stub.rmToGsStatusMessage(myCluster.getUrl(),busyCount);
+				
+				long eTime = System.currentTimeMillis();
+				
+				synchronized (lock) {
+					messageTime += eTime - sTime;
+					logger.debug("Message_time,"+messageTime);
+				}
+				
 				break;
 			}
 			catch (Exception e) {
