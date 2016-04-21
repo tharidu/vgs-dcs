@@ -239,7 +239,8 @@ public class RunClient implements ClientRemoteMessaging {
 				logger.error("Rmi exception occured could not submit jobs to gs@" + gsaddr);
 				e.printStackTrace();
 			}
-		} else {
+		} 
+		else {
 			try {
 				// Grid workload archive
 				gwa(cl, gsarr, args[0]);

@@ -20,7 +20,7 @@ public class gwaParser {
 	      PrintWriter u2 = new PrintWriter("u2.txt", "UTF-8");
 	      
 	      int startTime = 1133308800;
-	      int endTime = startTime + 60*60*2;  // 2 hours
+	      double endTime = startTime + 60*60*0.5;  // 2 hours
 	      int totalJobs = 0;
 	      stmt = c.createStatement();
 	      // Jobs less than 15 minutes
