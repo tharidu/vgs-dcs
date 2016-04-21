@@ -1,0 +1,4 @@
+19:50:01.257 INFO  dcs.group8.models.Cluster 54 <init> - Initializing cluster@node326
+19:50:01.258 INFO  dcs.group8.models.Cluster 58 <init> - Creating a resource manager for this cluster with 5 nodes
+19:50:01.434 INFO  dcs.group8.models.Cluster 114 setUpRegistry - Resource Manager registry is properly set up!
+19:50:01.434 INFO  dcs.group8.models.Cluster 77 informGS - Sending a message to gs@node326 that i am up and running

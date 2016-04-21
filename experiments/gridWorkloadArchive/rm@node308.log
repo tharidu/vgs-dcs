@@ -1,6 +1,0 @@
-11:30:21.526 INFO  dcs.group8.models.ResourceManager 50 <init> - The resource manager rm@node308 was created
-11:30:21.527 INFO  dcs.group8.models.ResourceManager 50 <init> - The resource manager rm@node308 was created
-13:23:06.390 INFO  dcs.group8.models.ResourceManager 132 gsToRmJobMessage - Adding job with Job_id: 427 to a node at cluster@10.141.3.31
-13:23:06.487 DEBUG dcs.group8.models.ResourceManager 78 callBackHandler - Message_time,12
-13:23:06.487 INFO  dcs.group8.models.ResourceManager 81 callBackHandler - Job with Job_id:427 was completed
-13:23:06.487 INFO  dcs.group8.models.ResourceManager 106 callBackHandler - One more node is available now
