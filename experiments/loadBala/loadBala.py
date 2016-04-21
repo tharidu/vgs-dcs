@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 # grep DEBUG  <gslogfile.log> >> debugs/<vofile.txt>
 
 ### Python commands (could be run in a shell) ###
-#with open("vo1.txt",'r') as f:
-#	l1 = map(lambda x (x.split(' ')[-1].split(',')[-3],x.split(' ')[-1].split(',')[-1].strip('\n')),f.readlines())
+#with open("vo3",'r') as f:
+#	l3 = map(lambda x: (x.split(' ')[-1].split(',')[-9],x.split(' ')[-1].split(',')[-7].strip('\n')),f.readlines())
 
 #vo1 = map(lambda x: int(x[0])+int(x[1]),l1)	
 
